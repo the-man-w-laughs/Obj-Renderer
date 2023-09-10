@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Security.Principal;
 using Contracts.Transformer;
 
 namespace Transformer.Providers
@@ -7,18 +8,29 @@ namespace Transformer.Providers
     {
         public Matrix4x4 WorldToViewMatrix(Vector3 eye, Vector3 target, Vector3 up)
         {
-            Vector3 zAxis = Vector3.Normalize(eye - target);
-            Vector3 xAxis = Vector3.Normalize(Vector3.Cross(up, zAxis));
-            Vector3 yAxis = Vector3.Cross(zAxis, xAxis);
+            Vector3 zaxis = Vector3.Normalize(eye - target);
+            Vector3 xaxis = Vector3.Normalize(Vector3.Cross(up, zaxis));
+            Vector3 yaxis = Vector3.Cross(zaxis, xaxis);
 
-            Matrix4x4 viewMatrix = new Matrix4x4(
-                xAxis.X, xAxis.Y, xAxis.Z, -Vector3.Dot(xAxis, eye),
-                yAxis.X, yAxis.Y, yAxis.Z, -Vector3.Dot(yAxis, eye),
-                zAxis.X, zAxis.Y, zAxis.Z, -Vector3.Dot(zAxis, eye),
-                0, 0, 0, 1
-            );
+            Matrix4x4 result = Matrix4x4.Identity;
 
-            return viewMatrix;
+            result.M11 = xaxis.X;
+            result.M12 = yaxis.X;
+            result.M13 = zaxis.X;
+
+            result.M21 = xaxis.Y;
+            result.M22 = yaxis.Y;
+            result.M23 = zaxis.Y;
+
+            result.M31 = xaxis.Z;
+            result.M32 = yaxis.Z;
+            result.M33 = zaxis.Z;
+
+            result.M41 = -Vector3.Dot(xaxis, eye);
+            result.M42 = -Vector3.Dot(yaxis, eye);
+            result.M43 = -Vector3.Dot(zaxis, eye);
+
+            return result;
         }
     }
 }

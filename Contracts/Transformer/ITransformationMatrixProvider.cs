@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Contracts.Transformer
 {
-    public interface ITransformationProvider
+    public interface ITransformationMatrixProvider
     {
         public Matrix4x4 CreateScaleMatrix(float scaleX, float scaleY, float scaleZ);
 

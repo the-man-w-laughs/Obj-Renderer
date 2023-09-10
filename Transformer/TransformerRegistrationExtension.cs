@@ -15,7 +15,7 @@ namespace Parser
         public static void RegisterTransformerDependencies(this IServiceCollection services)
         {
             services.AddSingleton<IProjectionMatrixProvider, ProjectionMatrixProvider>();
-            services.AddSingleton<ITransformationProvider, TransformationProvider>();
+            services.AddSingleton<ITransformationMatrixProvider, TransformationMatrixProvider>();
             services.AddSingleton<IViewMatrixProvider, ViewMatrixProvider>();
             services.AddSingleton<IViewportMatrixProvider, ViewportMatrixProvider>();
         }

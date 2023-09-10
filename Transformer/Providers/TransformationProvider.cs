@@ -3,12 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection.Metadata;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Transformer.Providers
 {
-    public class TransformationProvider : ITransformationProvider
+    public class TransformationMatrixProvider : ITransformationMatrixProvider
     {
         public Matrix4x4 CreateScaleMatrix(float scaleX, float scaleY, float scaleZ)
         {
@@ -32,22 +34,34 @@ namespace Transformer.Providers
 
         public Matrix4x4 CreateRotationMatrix(Vector3 axis, float angleInDegrees)
         {
+            // Normalize the axis vector
+            axis = Vector3.Normalize(axis);
+
             // Convert the angle from degrees to radians
-            float angleInRadians = MathF.PI * angleInDegrees / 180.0f;
+            float angleInRadians = angleInDegrees * (float)Math.PI / 180.0f;
 
-            float cos = (float)Math.Cos(angleInRadians);
-            float sin = (float)Math.Sin(angleInRadians);
-            float x = axis.X;
-            float y = axis.Y;
-            float z = axis.Z;
+            float x = axis.X, y = axis.Y, z = axis.Z;
+            float sa = MathF.Sin(angleInRadians), ca = MathF.Cos(angleInRadians);
+            float xx = x * x, yy = y * y, zz = z * z;
+            float xy = x * y, xz = x * z, yz = y * z;
 
-            return new Matrix4x4(
-                cos + (1 - cos) * x * x, (1 - cos) * x * y - sin * z, (1 - cos) * x * z + sin * y, 0,
-                (1 - cos) * x * y + sin * z, cos + (1 - cos) * y * y, (1 - cos) * y * z - sin * x, 0,
-                (1 - cos) * x * z - sin * y, (1 - cos) * y * z + sin * x, cos + (1 - cos) * z * z, 0,
-                0, 0, 0, 1
-            );
+            Matrix4x4 rotationMatrix = Matrix4x4.Identity;
+
+            rotationMatrix.M11 = xx + ca * (1.0f - xx);
+            rotationMatrix.M12 = xy - ca * xy + sa * z;
+            rotationMatrix.M13 = xz - ca * xz - sa * y;
+
+            rotationMatrix.M21 = xy - ca * xy - sa * z;
+            rotationMatrix.M22 = yy + ca * (1.0f - yy);
+            rotationMatrix.M23 = yz - ca * yz + sa * x;
+
+            rotationMatrix.M31 = xz - ca * xz + sa * y;
+            rotationMatrix.M32 = yz - ca * yz - sa * x;
+            rotationMatrix.M33 = zz + ca * (1.0f - zz);         
+
+            return rotationMatrix;
         }
+
     }
 
 
