@@ -16,6 +16,7 @@ public class ViewMatrixProviderTests
     [Theory]
     [InlineData(1.0f, 2.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f)] // Test case 1
     [InlineData(2.0f, 3.0f, 4.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f)] // Test case 2
+    [InlineData(20.0f, -3.0f, 454.0f, 13.0f, 14.0f, -41.0f, 0.0f, 50f, 0.45f)] // Test case 2
     // Add more test cases as needed
     public void WorldToViewMatrix_CreatesCorrectViewMatrix(
         float eyeX, float eyeY, float eyeZ,

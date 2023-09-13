@@ -19,7 +19,7 @@ namespace Transformer.Providers
                 0, 0, 0, 1
             );
 
-            return viewportMatrix;
+            return Matrix4x4.Transpose(viewportMatrix);
         }
     }
 }

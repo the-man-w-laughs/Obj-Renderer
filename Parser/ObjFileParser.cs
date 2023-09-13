@@ -37,31 +37,9 @@ public class ObjFileParser : IObjFileParcer
         foreach (var line in data)
         {
             processLine(line, obj);
-        }
-
-        updateSize(obj);
+        }        
 
         return obj;
-    }
-
-    /// <summary>
-    /// Sets our global object size with an extent object
-    /// </summary>
-    private void updateSize(Obj obj)
-    {
-        // If there are no vertices, do nothing.
-        if (obj.VertexList.Count == 0)
-        {
-            return;
-        }
-
-        // Update the properties of the Size object based on VertexList.
-        obj.Size.XMax = obj.VertexList.Max(v => v.X);
-        obj.Size.XMin = obj.VertexList.Min(v => v.X);
-        obj.Size.YMax = obj.VertexList.Max(v => v.Y);
-        obj.Size.YMin = obj.VertexList.Min(v => v.Y);
-        obj.Size.ZMax = obj.VertexList.Max(v => v.Z);
-        obj.Size.ZMin = obj.VertexList.Min(v => v.Z);
     }
 
     /// <summary>
@@ -99,7 +77,7 @@ public class ObjFileParser : IObjFileParcer
                     TryParseFloat(parts[2], out float y) &&
                     TryParseFloat(parts[3], out float z))
                 {
-                    var v = new Vector3 { X = x, Y = y, Z = z };
+                    var v = new Vector4 { X = x, Y = y, Z = z, W = 1};
                     obj.VertexList.Add(v);                    
                 }
                 else

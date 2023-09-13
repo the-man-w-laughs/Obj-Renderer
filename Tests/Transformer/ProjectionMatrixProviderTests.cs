@@ -16,6 +16,7 @@ namespace Tests.Transformer
 
         [Theory]
         [InlineData(60.0f, 16.0f / 9.0f, 0.1f, 100.0f)]
+        [InlineData(30.0f, 1f, 10f, 500.0f)]
         public void CreatePerspectiveProjectionMatrix_MatchesMatrix4x4Method(float fieldOfView, float aspectRatio, float zNear, float zFar)
         {
             // Arrange - create the matrices with mock data

@@ -21,6 +21,6 @@ public class ViewportMatrixProviderTests
     // Add more test cases as needed
     public void CreateProjectionToViewportMatrix_CreatesCorrectMatrix(int screenWidth, int screenHeight)
     {        
-        Assert.Equal(1, 1);
+        Assert.True(true);
     }
 }
