@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using System.Security.Principal;
-using Contracts.Transformer;
+using Business.Contracts.Transformer.Providers;
 
 namespace Transformer.Providers
 {

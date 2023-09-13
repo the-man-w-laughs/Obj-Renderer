@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Contracts.Transformer
+namespace Business.Contracts.Transformer.Providers
 {
     public interface IViewportMatrixProvider
     {

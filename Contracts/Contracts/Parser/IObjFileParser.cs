@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Contracts.Parser
+namespace Business.Contracts.Parser
 {
     public interface IObjFileParcer
     {

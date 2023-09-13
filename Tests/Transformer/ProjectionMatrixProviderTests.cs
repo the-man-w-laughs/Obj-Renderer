@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Numerics;
-using Contracts.Transformer;
+using Business.Contracts.Transformer.Providers;
 using Xunit;
 
 namespace Tests.Transformer

@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Contracts.Transformer
+namespace Business.Contracts.Transformer.Providers
 {
     public interface ITransformationMatrixProvider
     {

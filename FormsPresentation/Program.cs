@@ -1,4 +1,3 @@
-using Contracts;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Parser;
@@ -32,6 +31,9 @@ namespace FormsPresentation
                 .ConfigureServices((context, services) => {
                     services.RegisterParserDependencies();
                     services.RegisterTransformerDependencies();
+                    services.RegisterBusinessDependencies();
+                    services.RegisterDrawerDependencies();
+                    services.RegisterBusinessDependencies();
                     services.AddTransient<MainForm>();
                 });
         }

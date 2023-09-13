@@ -1,4 +1,4 @@
-﻿using Contracts.Transformer;
+﻿using Business.Contracts.Transformer.Providers;
 using System;
 using System.Numerics;
 using Xunit;

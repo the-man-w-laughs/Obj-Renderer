@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Transformer.Transpormers
 {
-    public static class CoordinateTransformer
+    public class CoordinateTransformer: ICoordinateTransformer
     {
-        public static void ApplyTransform(this List<Vector4> vectors, Matrix4x4 transform)
+        public void ApplyTransform(List<Vector4> vectors, Matrix4x4 transform)
         {
             for (int i = 0; i < vectors.Count; i++)
             {
@@ -18,20 +18,40 @@ namespace Transformer.Transpormers
             }
         }
 
-        public static void ApplyTransformAndDivideByW(this List<Vector4> vectors, Matrix4x4 transform)
+        public List<Vector4> ApplyTransformAndDivideByWAndCopy(List<Vector4> vectors, Matrix4x4 transform)
         {
+            //List<Vector4> transformedVectors = new List<Vector4>();
+            //object lockObject = new object(); // Create a lock object
+
+            //Parallel.For(0, vectors.Count, i =>
+            //{
+            //    var transformedVertex = Vector4.Transform(vectors[i], transform);
+            //    var transformedVector = transformedVertex / transformedVertex.W;
+
+            //    // Safely add the transformed vector to the list using a lock
+            //    lock (lockObject)
+            //    {
+            //        transformedVectors.Add(transformedVector);
+            //    }
+            //});
+
+            List<Vector4> transformedVectors = new List<Vector4>();
+
             for (int i = 0; i < vectors.Count; i++)
             {
                 var transformedVertex = Vector4.Transform(vectors[i], transform);
-                vectors[i] = transformedVertex / transformedVertex.W;
+                var transformedVector = transformedVertex / transformedVertex.W;
+
+                transformedVectors.Add(transformedVector);
             }
+            return transformedVectors;
         }
-        public static List<Vector4> ApplyTransformAndCopy(this List<Vector4> vectors, Matrix4x4 transform)
+        public List<Vector4> ApplyTransformAndCopy(List<Vector4> vectors, Matrix4x4 transform)
         {
             return vectors.Select(v => Vector4.Transform(v, transform)).ToList();            
         }
 
-        public static List<Vector4> DivideByW(this List<Vector4> vectors)
+        public List<Vector4> DivideByW(List<Vector4> vectors)
         {
             return vectors.Select(v => new Vector4(v.X / v.W, v.Y / v.W, v.Z / v.W, 1)).ToList();
         }

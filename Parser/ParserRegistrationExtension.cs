@@ -1,4 +1,4 @@
-﻿using Contracts.Parser;
+﻿using Business.Contracts.Parser;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;

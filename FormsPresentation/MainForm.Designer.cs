@@ -28,19 +28,26 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             pictureBox = new PictureBox();
+            timer1 = new System.Windows.Forms.Timer(components);
             ((System.ComponentModel.ISupportInitialize)pictureBox).BeginInit();
             SuspendLayout();
             // 
-            // pictureBox1
+            // pictureBox
             // 
             pictureBox.Dock = DockStyle.Fill;
             pictureBox.Location = new Point(0, 0);
-            pictureBox.Name = "pictureBox1";
+            pictureBox.Name = "pictureBox";
             pictureBox.Size = new Size(800, 450);
             pictureBox.TabIndex = 0;
             pictureBox.TabStop = false;
             pictureBox.Paint += pictureBox_Paint;
+            // 
+            // timer1
+            // 
+            timer1.Interval = 1;
+            timer1.Tick += timer1_Tick;
             // 
             // MainForm
             // 
@@ -58,5 +65,6 @@
         #endregion
 
         private PictureBox pictureBox;
+        private System.Windows.Forms.Timer timer1;
     }
 }

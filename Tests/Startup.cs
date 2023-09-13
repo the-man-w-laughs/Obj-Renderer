@@ -1,5 +1,4 @@
-﻿using Contracts.Parser;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Parser;
 
 public class Startup

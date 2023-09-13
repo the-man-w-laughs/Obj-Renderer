@@ -1,4 +1,4 @@
-﻿using Contracts.Parser;
+﻿using Business.Contracts.Parser;
 using Domain.ObjClass;
 using System.Drawing;
 using System.Globalization;
@@ -77,7 +77,7 @@ public class ObjFileParser : IObjFileParcer
                     TryParseFloat(parts[2], out float y) &&
                     TryParseFloat(parts[3], out float z))
                 {
-                    var v = new Vector4 { X = x, Y = y, Z = z, W = 1};
+                    var v = new Vector3 { X = x, Y = y, Z = z};
                     obj.VertexList.Add(v);                    
                 }
                 else

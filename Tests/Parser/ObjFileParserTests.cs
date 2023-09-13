@@ -1,4 +1,4 @@
-using Contracts.Parser;
+using Business.Contracts.Parser;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Parser;
 using System;
