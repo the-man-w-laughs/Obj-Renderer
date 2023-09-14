@@ -43,6 +43,10 @@
             pictureBox.TabIndex = 0;
             pictureBox.TabStop = false;
             pictureBox.Paint += pictureBox_Paint;
+            pictureBox.MouseDown += pictureBox_MouseDown;
+            pictureBox.MouseMove += pictureBox_MouseMove;
+            pictureBox.MouseUp += pictureBox_MouseUp;
+            pictureBox.MouseWheel += pictureBox_MouseWheel;
             // 
             // timer1
             // 
@@ -58,9 +62,11 @@
             Name = "MainForm";
             Text = "Form1";
             Load += MainForm_Load;
+            KeyDown += MainForm_KeyDown;
             ((System.ComponentModel.ISupportInitialize)pictureBox).EndInit();
             ResumeLayout(false);
         }
+
 
         #endregion
 

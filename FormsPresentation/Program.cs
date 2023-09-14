@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NLog;
 using Parser;
 using Renderer;
 using System;
@@ -17,6 +18,8 @@ namespace FormsPresentation
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            LogManager.LoadConfiguration(@"D:\Projects\7thSem\Graphics\Renderer\FormsPresentation\NLog.config");
 
             var host = CreateHostBuilder().Build();
             ServiceProvider = host.Services;
