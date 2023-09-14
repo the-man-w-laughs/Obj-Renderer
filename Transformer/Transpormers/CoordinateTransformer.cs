@@ -20,20 +20,6 @@ namespace Transformer.Transpormers
 
         public List<Vector4> ApplyTransformAndDivideByWAndCopy(List<Vector4> vectors, Matrix4x4 transform)
         {
-            //List<Vector4> transformedVectors = new List<Vector4>();
-            //object lockObject = new object(); // Create a lock object
-
-            //Parallel.For(0, vectors.Count, i =>
-            //{
-            //    var transformedVertex = Vector4.Transform(vectors[i], transform);
-            //    var transformedVector = transformedVertex / transformedVertex.W;
-
-            //    // Safely add the transformed vector to the list using a lock
-            //    lock (lockObject)
-            //    {
-            //        transformedVectors.Add(transformedVector);
-            //    }
-            //});
 
             List<Vector4> transformedVectors = new List<Vector4>();
 

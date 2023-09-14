@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business", "Contracts\Busin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{CAB55EF3-E733-4A58-8551-AB171E661E7A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Drawer", "Drawer\Drawer.csproj", "{7B9D917E-DFBE-4D06-98B0-87578D657BCC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormsPresentation", "FormsPresentation\FormsPresentation.csproj", "{EA61A593-32C7-440A-A9A3-04FD531621CE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parser", "Parser\Parser.csproj", "{13F8E7AF-1FBF-4C9D-A237-E0575C03B9AF}"
@@ -19,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transformer", "Transformer\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfPresentation", "WpfPresentation\WpfPresentation.csproj", "{A9665650-97B3-49A9-BE5F-B8513EE42062}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SfmlPresentation", "SfmlPresentation\SfmlPresentation.csproj", "{B646B822-624F-499B-B972-B7F1027099BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SfmlPresentation", "SfmlPresentation\SfmlPresentation.csproj", "{B646B822-624F-499B-B972-B7F1027099BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +33,6 @@ Global
 		{CAB55EF3-E733-4A58-8551-AB171E661E7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAB55EF3-E733-4A58-8551-AB171E661E7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAB55EF3-E733-4A58-8551-AB171E661E7A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B9D917E-DFBE-4D06-98B0-87578D657BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B9D917E-DFBE-4D06-98B0-87578D657BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B9D917E-DFBE-4D06-98B0-87578D657BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B9D917E-DFBE-4D06-98B0-87578D657BCC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EA61A593-32C7-440A-A9A3-04FD531621CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EA61A593-32C7-440A-A9A3-04FD531621CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA61A593-32C7-440A-A9A3-04FD531621CE}.Release|Any CPU.ActiveCfg = Release|Any CPU

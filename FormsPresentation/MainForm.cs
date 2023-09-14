@@ -2,10 +2,12 @@
 using Business.Contracts.Parser;
 using Business.Contracts.Transformer.Providers;
 using Domain.ObjClass;
-using Drawer;
+using FormsPresentation.Contracts;
+using FormsPresentation.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using Parser;
+using SfmlPresentation.Scene;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
@@ -26,86 +28,16 @@ namespace Renderer
         private readonly ITransformationHelper _transformationHelper;
         private readonly IFastObjDrawer _fastObjDrawer;
         private readonly Bitmap _bitMap;
+        private readonly Camera camera;
         private readonly Obj _obj;
 
         private List<Vector4> vertices;
-
-        private double _alpha = Math.PI / 2;
-        private double _beta = 0;
-
-        private double _r = 30;
-
-        public double R
-        {
-            get { return _r; }
-            set
-            {
-                if (value > 5 && value < 100)
-                {
-                    _r = value;
-                }
-            }
-        }
-
-        public double Alpha
-        {
-            get { return _alpha; }
-            set
-            {
-                if (value >= 0 && value <= Math.PI)
-                {
-                    _alpha = value;
-                }
-            }
-        }
-
-        public double Beta
-        {
-            get { return _beta; }
-            set
-            {
-                if (value >= 0 && value <= 2 * Math.PI)
-                {
-                    _beta = value;
-                }
-            }
-        }
-
-        public void ChangeAlpha(double delta)
-        {
-            _alpha = (_alpha + delta) % (2 * Math.PI);
-            if (_alpha < 0)
-            {
-                _alpha += 2 * Math.PI;
-            }
-        }
-        public void ChangeBeta(double delta)
-        {
-            _beta = (_beta + delta) % (2 * Math.PI);
-            if (_beta < 0)
-            {
-                _beta += 2 * Math.PI;
-            }
-        }
 
 
         private int Scale = 1;
         private Point _startPoint;
         private bool _isDown;
         private int _count;
-
-        private Vector3 Eye
-        {
-            get
-            {
-                double x = R * Math.Sin(Alpha) * Math.Sin(Beta);
-                double y = R * Math.Cos(Alpha);
-                double z = R * Math.Sin(Alpha) * Math.Cos(Beta);
-
-                return new Vector3((float)x, (float)y, (float)z);
-            }
-        }
-
 
         public MainForm(IObjFileParcer objFileParcer,
                         ITransformationHelper transformationHelper,
@@ -116,6 +48,8 @@ namespace Renderer
             _transformationHelper = transformationHelper;
             _fastObjDrawer = fastObjDrawer;
             _bitMap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+
+            camera = new Camera(Math.PI / 2, 0, 30);
 
             string objFilePath = @"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\12140_Skull_v3_L2.obj";
 
@@ -128,7 +62,7 @@ namespace Renderer
             _isDown = false;
             _count = 0;
 
-            vertices = _transformationHelper.ConvertToGlobalCoordinates(_obj, Scale);
+            vertices = _transformationHelper.ConvertToGlobalCoordinates(_obj, Scale, new Vector3(1,1,1), 0);
             //timer1.Interval = 100;
             //timer1.Start();
         }
@@ -142,9 +76,11 @@ namespace Renderer
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            _fastObjDrawer.Draw(_obj.FaceList, vertices, _bitMap, Eye);
-            stopwatch.Stop();
-            logger.Info(Eye);
+
+            var verticesToDraw = _transformationHelper.ConvertTo2DCoordinates(vertices, _bitMap.Width, _bitMap.Height, camera.Eye);
+
+            _fastObjDrawer.Draw(_obj.FaceList, verticesToDraw, _bitMap);
+            stopwatch.Stop();            
             logger.Info(stopwatch.Elapsed.Milliseconds);
             e.Graphics.DrawImage(_bitMap, 0, 0);
         }
@@ -153,9 +89,9 @@ namespace Renderer
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            Alpha = Math.PI / 4;
-            Beta = Math.PI / 4;
-            pictureBox.Invalidate();
+            //Alpha = Math.PI / 4;
+            //Beta = Math.PI / 4;
+            //pictureBox.Invalidate();
         }
         private void pictureBox_MouseDown(object sender, MouseEventArgs e)
         {
@@ -195,27 +131,27 @@ namespace Renderer
             var radiusDelta = 5;
             if (e.KeyCode == Keys.Left)
             {
-                ChangeBeta(-angleDelta);
+                camera.ChangeBeta(-angleDelta);
             }
             else if (e.KeyCode == Keys.Right)
             {                
-                ChangeBeta(angleDelta);
+                camera.ChangeBeta(angleDelta);
             }
             else if (e.KeyCode == Keys.Up)
-            {                
-                ChangeAlpha(-angleDelta);
+            {
+                camera.ChangeAlpha(-angleDelta);
             }
             else if (e.KeyCode == Keys.Down)
             {                     
-                ChangeAlpha(angleDelta);
+                camera.ChangeAlpha(angleDelta);
             }            
             if (e.KeyCode == Keys.Add || e.KeyCode == Keys.Oemplus)
             {
-                R -= radiusDelta;
+                camera.R -= radiusDelta;
             }
             else if (e.KeyCode == Keys.Subtract || e.KeyCode == Keys.OemMinus)
             {
-                R += radiusDelta;
+                camera.R += radiusDelta;
             }
             pictureBox.Invalidate();
         }

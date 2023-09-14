@@ -1,3 +1,5 @@
+using FormsPresentation.Contracts;
+using FormsPresentation.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
@@ -34,9 +36,10 @@ namespace FormsPresentation
                 .ConfigureServices((context, services) => {
                     services.RegisterParserDependencies();
                     services.RegisterTransformerDependencies();
+                    services.RegisterBusinessDependencies();                    
                     services.RegisterBusinessDependencies();
-                    services.RegisterDrawerDependencies();
-                    services.RegisterBusinessDependencies();
+                    services.AddTransient<IFastObjDrawer, FastObjDrawer>();
+                    services.AddTransient<IDrawer,  BresenhamDrawer>();
                     services.AddTransient<MainForm>();
                 });
         }

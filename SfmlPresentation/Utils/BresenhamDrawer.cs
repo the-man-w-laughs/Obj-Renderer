@@ -1,16 +1,11 @@
-﻿using Business.Contracts.Drawer;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SFML.Graphics;
+using SfmlPresentation.Contracts;
 
-namespace Drawer
+namespace SfmlPresentation.Utils
 {
-    public class BresenhamDrawer: IDrawer
+    public class BresenhamDrawer : IDrawer
     {
-        public void DrawLine(Bitmap bitmap, Color color, int x0, int y0, int x1, int y1)
+        public void DrawLine(Image bitmap, Color color, int x0, int y0, int x1, int y1)
         {
 
             int deltaX = Math.Abs(x1 - x0);
@@ -21,7 +16,7 @@ namespace Drawer
             int yIncrement = y0 < y1 ? 1 : -1;
             int error = deltaX - deltaY;
 
-            bitmap.SetPixel(x, y, color);
+            bitmap.SetPixel((uint)x, (uint)y, color);
 
             while (x != x1 || y != y1)
             {
@@ -39,7 +34,7 @@ namespace Drawer
                     y += yIncrement;
                 }
 
-                bitmap.SetPixel(x, y, color);               
+                bitmap.SetPixel((uint)x, (uint)y, color);
             }
         }
     }

@@ -35,6 +35,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Contracts\Business.csproj" />
+    <ProjectReference Include="..\Parser\Parser.csproj" />
+    <ProjectReference Include="..\Transformer\Transformer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="sfml-audio">
       <HintPath>C:\Users\nazar\Downloads\SFML.Net-2.4-64-bit\SFML.Net-2.4\lib\sfml-audio.dll</HintPath>
     </Reference>

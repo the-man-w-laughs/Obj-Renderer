@@ -1,7 +1,7 @@
 ﻿using Business.Contracts;
-using Business.Contracts.Drawer;
 using Business.Contracts.Transformer.Providers;
 using Domain.ObjClass;
+using FormsPresentation.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Transformer.Transpormers;
 
-namespace Business
+namespace FormsPresentation.Utils
 {
     public class FastObjDrawer : IFastObjDrawer
     {
@@ -35,22 +35,9 @@ namespace Business
             _viewportMatrixProvider = viewportMatrixProvider;
         }
 
-        public void Draw(List<Face> faces, List<Vector4> vertices, Bitmap bitmap, Vector3 eye)
+        public void Draw(List<Face> faces, List<Vector4> verticesToDraw, Bitmap bitmap)
         {
-            var projectionMatrix = _projectionMatrixProvider.CreatePerspectiveProjectionMatrix(90.0f, bitmap.Width / bitmap.Height, 1.0f, 100.0f);
-            var viewportMatrix = _viewportMatrixProvider.CreateProjectionToViewportMatrix(bitmap.Width, bitmap.Height, 0, 0);
-
-            var target = new Vector3(0, 0, 0);
-            //var up = new Vector3(-eye.X, (eye.X * eye.X + eye.Y * eye.Y + eye.Z * eye.Z) / eye.Y - eye.Y, -eye.Z);
-            var up = new Vector3(0, 1, 0);
-            var viewMatrix = _viewMatrixProvider.WorldToViewMatrix(eye, target, up);
-
-            // Combine matrices
-            var finalMatrix = viewMatrix * projectionMatrix * viewportMatrix;
-
-            var verticesToDraw = _coordinateTransformer.ApplyTransformAndDivideByWAndCopy(vertices, finalMatrix);
-
-            Parallel.ForEach(faces, face =>
+            foreach (var face in faces)
             {
                 for (int i = 0; i < face.VertexIndexList.Count() - 1; i++)
                 {
@@ -74,7 +61,7 @@ namespace Business
                 int firstY = (int)firstPoint.Y;
 
                 DrawLineIfIntersects(bitmap, lastX, lastY, firstX, firstY);
-            });
+            };
         }
 
         private void DrawLineIfIntersects(Bitmap bitmap, int startX, int startY, int endX, int endY)

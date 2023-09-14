@@ -13,8 +13,7 @@ namespace Parser
     public static class BusinessRegistrationExtension
     {
         public static void RegisterBusinessDependencies(this IServiceCollection services)
-        {
-            services.AddSingleton<IFastObjDrawer, FastObjDrawer>();
+        {           
             services.AddSingleton<ITransformationHelper, TransformationHelper>();
         }
     }

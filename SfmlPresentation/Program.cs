@@ -1,44 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using SFML;
 using SFML.Graphics;
+using SFML.System;
 using SFML.Window;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Parser;
+using Business.Contracts.Parser;
+using SfmlPresentation.Contracts;
+using Microsoft.Extensions.Logging;
+using SfmlPresentation.Utils;
 
-namespace SFML_Test
+namespace SFMLPixelDrawing
 {
-    static class Program
+    class Program
     {
-
-        static void OnClose(object sender, EventArgs e)
-        {
-            // Close the window when OnClose event is received
-            RenderWindow window = (RenderWindow)sender;
-            window.Close();
-        }
-
         static void Main()
         {
-            // Create the main window
-            RenderWindow app = new RenderWindow(new VideoMode(800, 600), "SFML Works!");
-            app.Closed += new EventHandler(OnClose);
+            var host = CreateHostBuilder().Build();
+            ServiceProvider = host.Services;
 
-            Color windowColor = new Color(0, 192, 255);
+            var game = ServiceProvider.GetRequiredService<MainWindow>();
+            game.Run();
+            
+        }
 
-            // Start the game loop
-            while (app.IsOpen)
-            {
-                // Process events
-                app.DispatchEvents();
-
-                // Clear screen
-                app.Clear(windowColor);
-
-                // Update the window
-                app.Display();
-            } //End game loop
-        } //End Main()
-    } //End Program
+    public static IServiceProvider ServiceProvider { get; private set; }
+    static IHostBuilder CreateHostBuilder()
+    {
+        return Host.CreateDefaultBuilder()
+            .ConfigureServices((context, services) => {
+                services.RegisterParserDependencies();
+                services.RegisterTransformerDependencies();
+                services.RegisterBusinessDependencies();                                
+                services.AddTransient<IDrawer, BresenhamDrawer>();
+                services.AddTransient<IFastObjDrawer, FastObjDrawer>();
+                services.AddTransient<MainWindow>();
+            });
+    }
+}
 }
