@@ -36,7 +36,7 @@ namespace SfmlPresentation.Scene
             get { return _r; }
             set
             {
-                if (value > 5 && value < 100)
+                if (value > 0 && value < 100)
                 {
                     _r = value;
                 }
@@ -69,11 +69,7 @@ namespace SfmlPresentation.Scene
 
         public void ChangeAlpha(double delta)
         {
-            _alpha = (_alpha + delta) % (2 * Math.PI);
-            if (_alpha < 0)
-            {
-                _alpha += 2 * Math.PI;
-            }
+            Alpha += delta;
         }
         public void ChangeBeta(double delta)
         {

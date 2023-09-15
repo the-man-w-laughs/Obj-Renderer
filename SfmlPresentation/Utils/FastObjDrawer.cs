@@ -30,7 +30,7 @@ namespace SfmlPresentation.Utils
             _viewportMatrixProvider = viewportMatrixProvider;
         }
 
-        public void Draw(List<Face> faces, List<Vector4> verticesToDraw, Image bitmap)
+        public void Draw(List<Face> faces, List<Vector4> verticesToDraw, Image bitmap, Color color)
         {
             foreach (var face in faces)
             {
@@ -44,7 +44,7 @@ namespace SfmlPresentation.Utils
                     int endX = (int)endPoint.X;
                     int endY = (int)endPoint.Y;
 
-                    DrawLineIfIntersects(bitmap, startX, startY, endX, endY);
+                    DrawLineIfIntersects(bitmap, color, startX, startY, endX, endY);
                 }
 
                 var lastPoint = verticesToDraw[face.VertexIndexList.Last() - 1];
@@ -55,11 +55,11 @@ namespace SfmlPresentation.Utils
                 int firstX = (int)firstPoint.X;
                 int firstY = (int)firstPoint.Y;
 
-                DrawLineIfIntersects(bitmap, lastX, lastY, firstX, firstY);
+                DrawLineIfIntersects(bitmap, color, lastX, lastY, firstX, firstY);
             };
         }
 
-        private void DrawLineIfIntersects(Image image, int startX, int startY, int endX, int endY)
+        private void DrawLineIfIntersects(Image image, Color color, int startX, int startY, int endX, int endY)
         {
             var bitmapWidth = image.Size.X;
             var bitmapHeight = image.Size.Y;
@@ -67,8 +67,10 @@ namespace SfmlPresentation.Utils
             if (startX >= 0 && startY >= 0 && startX < bitmapWidth && startY < bitmapHeight
                 && endX >= 0 && endY >= 0 && endX < bitmapWidth && endY < bitmapHeight)
             {
-                _drawer.DrawLine(image, Color.White, startX, startY, endX, endY);
+                _drawer.DrawLine(image, color, startX, startY, endX, endY);
             }
         }
+
+
     }
 }

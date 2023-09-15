@@ -13,6 +13,7 @@ using Business;
 using Domain.ObjClass;
 using System.Diagnostics;
 using SfmlPresentation.Scene;
+using SFML.System;
 
 public class MainWindow
 {
@@ -32,55 +33,105 @@ public class MainWindow
     private List<Vector4> vertices;
 
     private int Scale = 1;
+
     private Point _startPoint;
     private bool _isDown;
-    private Camera camera;
 
-    public void Run()
+    private Camera camera;
+    private Obj obj;
+
+    private RenderWindow app;
+    private uint screenWidth;
+    private uint screenHeight;
+
+    private Texture pixelTexture;
+    private Image image;
+    private Sprite pixelSprite;
+
+    void AppConfiguration()
     {
         var desktopMode = VideoMode.DesktopMode;
-
-        RenderWindow app = new RenderWindow(desktopMode, "SFML Works!", Styles.Default);
-
-        var screenWidth = desktopMode.Width;
-        var screenHeight = desktopMode.Height;
-
-        var obj = objFileParcer.ParseObjFile(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\Mario.obj");
-        var vertices = transformationHelper.ConvertToGlobalCoordinates(obj, 1, new Vector3(1, 1, 1), 0);                
-
-        Texture pixelTexture = new Texture(screenWidth, screenHeight);
-
-        Image image = new Image(screenWidth, screenHeight);
-       
-        Sprite pixelSprite = new Sprite(pixelTexture);
+        app = new RenderWindow(desktopMode, "Renderer", Styles.Default);
         app.Closed += (sender, e) => app.Close();
+        screenWidth = desktopMode.Width;
+        screenHeight = desktopMode.Height;
+    }
+
+    void LoadModel(string path)
+    {
+        obj = objFileParcer.ParseObjFile(path);
+        vertices = transformationHelper.ConvertToGlobalCoordinates(obj, 1, new Vector3(1, 1, 1), 0);
+        camera = new Camera(Math.PI / 2, 0, 7);
+    }
+
+    void CanvasConfiguration(uint screenWidth, uint screenHeight)
+    {
+        pixelTexture = new Texture(screenWidth, screenHeight);
+        image = new Image(screenWidth, screenHeight);
+        pixelSprite = new Sprite(pixelTexture);
+    }
+    public void Run()
+    {
+        AppConfiguration();
+        LoadModel(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\Mario.obj");
+        CanvasConfiguration(screenWidth, screenHeight);
 
         Stopwatch stopwatch = new Stopwatch();
-
-        camera = new Camera(Math.PI / 2, 0, 7);
-
         while (app.IsOpen)
         {
+            stopwatch.Start();
             app.DispatchEvents();
 
-            stopwatch.Start();
+            HandleKeyboardInput();
 
             ClearImage(image, new Color(0, 0, 0, 0));
-
-            app.Clear();
-            camera.ChangeBeta(0.1);
+            app.Clear(Color.Black);            
+            
             var verticesToDraw = transformationHelper.ConvertTo2DCoordinates(vertices, (int)screenWidth, (int)screenHeight, camera.Eye);
-            fastObjDrawer.Draw(obj.FaceList, verticesToDraw, image);
+            fastObjDrawer.Draw(obj.FaceList, verticesToDraw, image, Color.Green);
             pixelTexture.Update(image);
-            app.Draw(pixelSprite);
 
+            app.Draw(pixelSprite);                        
             app.Display();
 
             stopwatch.Stop();
             Console.WriteLine($"Frame Time (milliseconds): {stopwatch.ElapsedMilliseconds}");
-            stopwatch.Reset();
+            stopwatch.Reset();            
         }
     }
+
+    void HandleKeyboardInput()
+    {        
+        float deltaX = 0.05f;
+        float deltaY = 0.05f;
+        float deltaR = 1f;
+
+        if (Keyboard.IsKeyPressed(Keyboard.Key.Left))
+        {            
+            camera.ChangeBeta(-deltaX);
+        }
+        if (Keyboard.IsKeyPressed(Keyboard.Key.Right))
+        {         
+            camera.ChangeBeta(deltaX);
+        }
+        if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
+        {         
+            camera.ChangeAlpha(-deltaY);
+        }
+        if (Keyboard.IsKeyPressed(Keyboard.Key.Down))
+        {         
+            camera.ChangeAlpha(deltaY);
+        }
+        if (Keyboard.IsKeyPressed(Keyboard.Key.LBracket))
+        {         
+            camera.R += deltaR;
+        }
+        if (Keyboard.IsKeyPressed(Keyboard.Key.RBracket))
+        {         
+            camera.R = deltaR;
+        }
+    }
+
     private void ClearImage(Image image, Color clearColor)
     {
         for (uint x = 0; x < image.Size.X; x++)
