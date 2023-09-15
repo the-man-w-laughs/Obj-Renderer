@@ -134,7 +134,8 @@ public class MainWindow
             DrawImage(_obj.FaceList, verticesToDraw, _image, Color.White);
 
             stopwatch.Stop();
-            Console.WriteLine($"Frame Time (milliseconds): {stopwatch.ElapsedMilliseconds}");
+            var elapsed = stopwatch.ElapsedMilliseconds;
+            Console.WriteLine($"FPS: {(elapsed != 0 ? (1000.0f / elapsed).ToString() : "inf")} ({elapsed} ms/frame);");
             stopwatch.Reset();
         }
     }
