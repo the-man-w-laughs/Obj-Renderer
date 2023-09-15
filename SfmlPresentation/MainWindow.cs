@@ -14,90 +14,137 @@ using Domain.ObjClass;
 using System.Diagnostics;
 using SfmlPresentation.Scene;
 using SFML.System;
+using System.ComponentModel.DataAnnotations;
+using static System.Net.Mime.MediaTypeNames;
 
 public class MainWindow
 {
-    private readonly IObjFileParcer objFileParcer;
-    private readonly ITransformationHelper transformationHelper;
-    private readonly IFastObjDrawer fastObjDrawer;
+    private readonly IObjFileParcer _objFileParcer;
+    private readonly ITransformationHelper _transformationHelper;
+    private readonly IFastObjDrawer _fastObjDrawer;
 
     public MainWindow(IObjFileParcer objFileParcer,
                       ITransformationHelper transformationHelper,
                       IFastObjDrawer fastObjDrawer)
     {
-        this.objFileParcer = objFileParcer;
-        this.transformationHelper = transformationHelper;
-        this.fastObjDrawer = fastObjDrawer;
+        this._objFileParcer = objFileParcer;
+        this._transformationHelper = transformationHelper;
+        this._fastObjDrawer = fastObjDrawer;
     }
 
-    private List<Vector4> vertices;
+    private List<Vector4> _vertices;
 
-    private int Scale = 1;
+    private int _scale = 1;
 
     private Point _startPoint;
+    private double _alpha;
+    private double _beta;
     private bool _isDown;
+    private float _smoothness = 200;
+    private float _rSmoothness = 0.7f;
 
-    private Camera camera;
-    private Obj obj;
+    private Camera _camera;
+    private Obj _obj;
 
-    private RenderWindow app;
-    private uint screenWidth;
-    private uint screenHeight;
+    private RenderWindow _app;
+    private uint _screenWidth;
+    private uint _screenHeight;
 
-    private Texture pixelTexture;
-    private Image image;
-    private Sprite pixelSprite;
+    private Texture _pixelTexture;
+    private Image _image;
+    private Sprite _pixelSprite;
+    private List<Vector4> _oldVertices;
+
 
     void AppConfiguration()
     {
         var desktopMode = VideoMode.DesktopMode;
-        app = new RenderWindow(desktopMode, "Renderer", Styles.Default);
-        app.Closed += (sender, e) => app.Close();
-        screenWidth = desktopMode.Width;
-        screenHeight = desktopMode.Height;
+        _app = new RenderWindow(desktopMode, "Renderer", Styles.Default);
+        _app.Closed += (sender, e) => _app.Close();
+        _app.MouseButtonPressed += App_MouseButtonPressed;
+        _app.MouseMoved += _app_MouseMoved;        
+        _app.MouseButtonReleased += _app_MouseButtonReleased;
+        _app.MouseWheelMoved += _app_MouseWheelMoved;
+        _isDown = false;
+
+        _screenWidth = desktopMode.Width;
+        _screenHeight = desktopMode.Height;
     }
 
-    void LoadModel(string path)
+    private void _app_MouseWheelMoved(object? sender, MouseWheelEventArgs e)
     {
-        obj = objFileParcer.ParseObjFile(path);
-        vertices = transformationHelper.ConvertToGlobalCoordinates(obj, 1, new Vector3(1, 1, 1), 0);
-        camera = new Camera(Math.PI / 2, 0, 7);
+        _camera.R -= e.Delta * _rSmoothness;
+    }
+
+    private void _app_MouseButtonReleased(object? sender, MouseButtonEventArgs e)
+    {
+        _isDown = false;        
+    }
+
+    private void _app_MouseMoved(object? sender, MouseMoveEventArgs e)
+    {
+        if (!_isDown) return;
+        int deltaX = e.X - _startPoint.X, deltaY = e.Y - _startPoint.Y;
+        _camera.Alpha = _alpha - deltaY / _smoothness;
+        _camera.ChangeBetaAssign(_beta - deltaX / _smoothness);        
+    }
+
+    private void App_MouseButtonPressed(object? sender, MouseButtonEventArgs e)
+    {
+        _isDown = true;
+        _startPoint = new Point(e.X, e.Y);
+        _alpha = _camera.Alpha;
+        _beta = _camera.Beta;
+    }
+
+    void LoadScene(string path)
+    {
+        _obj = _objFileParcer.ParseObjFile(path);
+        _vertices = _transformationHelper.ConvertToGlobalCoordinates(_obj, 10, new Vector3(1, 1, 1), 0);
+        _oldVertices = new List<Vector4>();
+        _camera = new Camera(Math.PI / 2, 0, 7);
     }
 
     void CanvasConfiguration(uint screenWidth, uint screenHeight)
     {
-        pixelTexture = new Texture(screenWidth, screenHeight);
-        image = new Image(screenWidth, screenHeight);
-        pixelSprite = new Sprite(pixelTexture);
+        _pixelTexture = new Texture(screenWidth, screenHeight);
+        _image = new Image(screenWidth, screenHeight);
+        _pixelSprite = new Sprite(_pixelTexture);        
     }
     public void Run()
     {
         AppConfiguration();
-        LoadModel(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\Mario.obj");
-        CanvasConfiguration(screenWidth, screenHeight);
+        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\dragon.obj");
+        CanvasConfiguration(_screenWidth, _screenHeight);
 
         Stopwatch stopwatch = new Stopwatch();
-        while (app.IsOpen)
+        while (_app.IsOpen)
         {
             stopwatch.Start();
-            app.DispatchEvents();
-
-            HandleKeyboardInput();
-
-            ClearImage(image, new Color(0, 0, 0, 0));
-            app.Clear(Color.Black);            
+            _app.DispatchEvents();
+            //ClearImage(_image, Color.Black);
+            HandleKeyboardInput();            
+            if (_oldVertices.Count != 0)
+            {
+                _fastObjDrawer.Draw(_obj.FaceList, _oldVertices, _image, Color.Black);
+            }
             
-            var verticesToDraw = transformationHelper.ConvertTo2DCoordinates(vertices, (int)screenWidth, (int)screenHeight, camera.Eye);
-            fastObjDrawer.Draw(obj.FaceList, verticesToDraw, image, Color.Green);
-            pixelTexture.Update(image);
-
-            app.Draw(pixelSprite);                        
-            app.Display();
+            var verticesToDraw = _transformationHelper.ConvertTo2DCoordinates(_vertices, (int)_screenWidth, (int)_screenHeight, _camera.Eye);
+            _oldVertices = verticesToDraw.ToList();
+            DrawImage(_obj.FaceList, verticesToDraw, _image, Color.White);
 
             stopwatch.Stop();
             Console.WriteLine($"Frame Time (milliseconds): {stopwatch.ElapsedMilliseconds}");
-            stopwatch.Reset();            
+            stopwatch.Reset();
         }
+    }
+
+    void DrawImage(List<Face> faces, List<Vector4> vertices, Image image, Color color)
+    {
+        _fastObjDrawer.Draw(_obj.FaceList, vertices, image, color);
+        _pixelTexture.Update(image);
+        _app.Draw(_pixelSprite);
+        _app.Display();
     }
 
     void HandleKeyboardInput()
@@ -108,27 +155,27 @@ public class MainWindow
 
         if (Keyboard.IsKeyPressed(Keyboard.Key.Left))
         {            
-            camera.ChangeBeta(-deltaX);
+            _camera.ChangeBetaIncrement(-deltaX);
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.Right))
         {         
-            camera.ChangeBeta(deltaX);
+            _camera.ChangeBetaIncrement(deltaX);
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
         {         
-            camera.ChangeAlpha(-deltaY);
+            _camera.ChangeAlphaIncrement(-deltaY);
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.Down))
         {         
-            camera.ChangeAlpha(deltaY);
+            _camera.ChangeAlphaIncrement(deltaY);
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.LBracket))
         {         
-            camera.R += deltaR;
+            _camera.R += deltaR;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.RBracket))
         {         
-            camera.R = deltaR;
+            _camera.R -= deltaR;
         }
     }
 

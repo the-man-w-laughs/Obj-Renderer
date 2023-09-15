@@ -67,13 +67,26 @@ namespace SfmlPresentation.Scene
             }
         }
 
-        public void ChangeAlpha(double delta)
+        public void ChangeAlphaIncrement(double delta)
         {
             Alpha += delta;
         }
-        public void ChangeBeta(double delta)
+        public void ChangeBetaIncrement(double delta)
         {
             _beta = (_beta + delta) % (2 * Math.PI);
+            if (_beta < 0)
+            {
+                _beta += 2 * Math.PI;
+            }
+        }
+
+        public void ChangeAlphaAssign(double angle)
+        {
+            Alpha = angle;
+        }
+        public void ChangeBetaAssign(double angle)
+        {
+            _beta = (angle) % (2 * Math.PI);
             if (_beta < 0)
             {
                 _beta += 2 * Math.PI;

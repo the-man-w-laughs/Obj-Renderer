@@ -53,14 +53,13 @@ namespace Business
 
         public List<Vector4> ConvertTo2DCoordinates(List<Vector4> vertices, int width, int height, Vector3 eye)
         {
-            var projectionMatrix = _projectionMatrixProvider.CreatePerspectiveProjectionMatrix(90.0f, width / height, 1.0f, 100.0f);
+            var projectionMatrix = _projectionMatrixProvider.CreatePerspectiveProjectionMatrix(45.0f, (float)width / height, 1.0f, 100.0f);
             var viewportMatrix = _viewportMatrixProvider.CreateProjectionToViewportMatrix(width, height, 0, 0);
 
             var target = new Vector3(0, 0, 0);
             var up = new Vector3(0, 1, 0);
             var viewMatrix = _viewMatrixProvider.WorldToViewMatrix(eye, target, up);
 
-            // Combine matrices
             var finalMatrix = viewMatrix * projectionMatrix * viewportMatrix;
 
             return _coordinateTransformer.ApplyTransformAndDivideByWAndCopy(vertices, finalMatrix);
