@@ -11,7 +11,7 @@ namespace SfmlPresentation.Scene
     {
         private double _alpha;
         private double _beta;
-        private double _r;
+        private double _r;        
 
         public Camera(double alpha, double beta, double r)
         {
@@ -36,7 +36,7 @@ namespace SfmlPresentation.Scene
             get { return _r; }
             set
             {
-                if (value > 0 && value < 100)
+                if (value >  1 && value < 100)
                 {
                     _r = value;
                 }

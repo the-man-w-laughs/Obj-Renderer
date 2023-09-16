@@ -17,19 +17,22 @@ using SFML.System;
 using System.ComponentModel.DataAnnotations;
 using static System.Net.Mime.MediaTypeNames;
 
-public class MainWindow
+public partial class MainWindow
 {
     private readonly IObjFileParcer _objFileParcer;
     private readonly ITransformationHelper _transformationHelper;
-    private readonly IFastObjDrawer _fastObjDrawer;
+    private readonly IPolygonObjDrawer _polygonObjDrawer;
+    private readonly IRasterizationObjDrawer _rasterizationObjDrawer;
 
     public MainWindow(IObjFileParcer objFileParcer,
                       ITransformationHelper transformationHelper,
-                      IFastObjDrawer fastObjDrawer)
+                      IPolygonObjDrawer fastObjDrawer,
+                      IRasterizationObjDrawer rasterizationObjDrawer)
     {
         this._objFileParcer = objFileParcer;
         this._transformationHelper = transformationHelper;
-        this._fastObjDrawer = fastObjDrawer;
+        this._polygonObjDrawer = fastObjDrawer;
+        _rasterizationObjDrawer = rasterizationObjDrawer;
     }
 
     private List<Vector4> _vertices;
@@ -43,7 +46,8 @@ public class MainWindow
     private float _smoothness = 200;
     private float _rSmoothness = 0.7f;
 
-    private Camera _camera;
+    private Camera _camera = new Camera(Math.PI / 2, 0, 100);
+    private Camera _light = new Camera(Math.PI / 2, 0, 100);
     private Obj _obj;
 
     private RenderWindow _app;
@@ -53,7 +57,7 @@ public class MainWindow
     private Texture _pixelTexture;
     private Image _image;
     private Sprite _pixelSprite;
-    private List<Vector4> _oldVertices;
+    private List<Vector3> _oldVertices;
 
 
     void AppConfiguration()
@@ -71,38 +75,11 @@ public class MainWindow
         _screenHeight = desktopMode.Height;
     }
 
-    private void _app_MouseWheelMoved(object? sender, MouseWheelEventArgs e)
-    {
-        _camera.R -= e.Delta * _rSmoothness;
-    }
-
-    private void _app_MouseButtonReleased(object? sender, MouseButtonEventArgs e)
-    {
-        _isDown = false;        
-    }
-
-    private void _app_MouseMoved(object? sender, MouseMoveEventArgs e)
-    {
-        if (!_isDown) return;
-        int deltaX = e.X - _startPoint.X, deltaY = e.Y - _startPoint.Y;
-        _camera.Alpha = _alpha - deltaY / _smoothness;
-        _camera.ChangeBetaAssign(_beta - deltaX / _smoothness);        
-    }
-
-    private void App_MouseButtonPressed(object? sender, MouseButtonEventArgs e)
-    {
-        _isDown = true;
-        _startPoint = new Point(e.X, e.Y);
-        _alpha = _camera.Alpha;
-        _beta = _camera.Beta;
-    }
-
     void LoadScene(string path)
     {
         _obj = _objFileParcer.ParseObjFile(path);
         _vertices = _transformationHelper.ConvertToGlobalCoordinates(_obj, 10, new Vector3(1, 1, 1), 0);
-        _oldVertices = new List<Vector4>();
-        _camera = new Camera(Math.PI / 2, 0, 7);
+        _oldVertices = new List<Vector3>();        
     }
 
     void CanvasConfiguration(uint screenWidth, uint screenHeight)
@@ -114,7 +91,7 @@ public class MainWindow
     public void Run()
     {
         AppConfiguration();
-        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\dragon.obj");
+        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\cube.obj");
         CanvasConfiguration(_screenWidth, _screenHeight);
 
         Stopwatch stopwatch = new Stopwatch();
@@ -122,16 +99,17 @@ public class MainWindow
         {
             stopwatch.Start();
             _app.DispatchEvents();
-            //ClearImage(_image, Color.Black);
-            HandleKeyboardInput();            
-            if (_oldVertices.Count != 0)
-            {
-                _fastObjDrawer.Draw(_obj.FaceList, _oldVertices, _image, Color.Black);
-            }
-            
+            HandleKeyboardInput();
+
+            ClearImage(_image, Color.Black);
+            //if (_oldVertices.Count != 0)
+            //{
+            //    _rasterizationObjDrawer.Draw(_obj.FaceList, _oldVertices, _image);
+            //}
+
             var verticesToDraw = _transformationHelper.ConvertTo2DCoordinates(_vertices, (int)_screenWidth, (int)_screenHeight, _camera.Eye);
             _oldVertices = verticesToDraw.ToList();
-            DrawImage(_obj.FaceList, verticesToDraw, _image, Color.White);
+            DrawImage();
 
             stopwatch.Stop();
             var elapsed = stopwatch.ElapsedMilliseconds;
@@ -140,14 +118,39 @@ public class MainWindow
         }
     }
 
-    void DrawImage(List<Face> faces, List<Vector4> vertices, Image image, Color color)
+    void DrawImage()
     {
-        _fastObjDrawer.Draw(_obj.FaceList, vertices, image, color);
-        _pixelTexture.Update(image);
+        _rasterizationObjDrawer.Draw(_obj.FaceList, _oldVertices, _image, _light);
+        _pixelTexture.Update(_image);
         _app.Draw(_pixelSprite);
         _app.Display();
     }
 
+    private void _app_MouseWheelMoved(object? sender, MouseWheelEventArgs e)
+    {
+        _camera.R -= e.Delta * _rSmoothness;
+    }
+
+    private void _app_MouseButtonReleased(object? sender, MouseButtonEventArgs e)
+    {
+        _isDown = false;
+    }
+
+    private void _app_MouseMoved(object? sender, MouseMoveEventArgs e)
+    {
+        if (!_isDown) return;
+        int deltaX = e.X - _startPoint.X, deltaY = e.Y - _startPoint.Y;
+        _camera.Alpha = _alpha - deltaY / _smoothness;
+        _camera.ChangeBetaAssign(_beta - deltaX / _smoothness);
+    }
+
+    private void App_MouseButtonPressed(object? sender, MouseButtonEventArgs e)
+    {
+        _isDown = true;
+        _startPoint = new Point(e.X, e.Y);
+        _alpha = _camera.Alpha;
+        _beta = _camera.Beta;
+    }
     void HandleKeyboardInput()
     {        
         float deltaX = 0.05f;

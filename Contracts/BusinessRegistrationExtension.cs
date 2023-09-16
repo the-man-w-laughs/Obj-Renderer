@@ -14,7 +14,7 @@ namespace Parser
     {
         public static void RegisterBusinessDependencies(this IServiceCollection services)
         {           
-            services.AddSingleton<ITransformationHelper, TransformationHelper>();
+            services.AddTransient<ITransformationHelper, TransformationHelper>();
         }
     }
 }

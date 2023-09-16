@@ -1,13 +1,14 @@
 ﻿using SFML.Graphics;
+using SFML.Window;
 using SfmlPresentation.Contracts;
+using SfmlPresentation.Scene;
 
 namespace SfmlPresentation.Utils
 {
-    public class BresenhamDrawer : IDrawer
+    public class BresenhamDrawer : ILineDrawer
     {
-        public void DrawLine(Image bitmap, Color color, int x0, int y0, int x1, int y1)
+        public void DrawLine(Image image, Color color, int x0, int y0, int x1, int y1)
         {
-
             int deltaX = Math.Abs(x1 - x0);
             int deltaY = Math.Abs(y1 - y0);
             int x = x0;
@@ -16,7 +17,7 @@ namespace SfmlPresentation.Utils
             int yIncrement = y0 < y1 ? 1 : -1;
             int error = deltaX - deltaY;
 
-            bitmap.SetPixel((uint)x, (uint)y, color);
+            image.SetPixel((uint)x, (uint)y, color);
 
             while (x != x1 || y != y1)
             {
@@ -34,7 +35,7 @@ namespace SfmlPresentation.Utils
                     y += yIncrement;
                 }
 
-                bitmap.SetPixel((uint)x, (uint)y, color);
+                image.SetPixel((uint)x, (uint)y, color);
             }
         }
     }

@@ -18,17 +18,17 @@ namespace Transformer.Transpormers
             }
         }
 
-        public List<Vector4> ApplyTransformAndDivideByWAndCopy(List<Vector4> vectors, Matrix4x4 transform)
+        public List<Vector3> ApplyTransformAndDivideByWAndCopy(List<Vector4> vectors, Matrix4x4 transform)
         {
 
-            List<Vector4> transformedVectors = new List<Vector4>();
+            List<Vector3> transformedVectors = new List<Vector3>();
 
             for (int i = 0; i < vectors.Count; i++)
             {
                 var transformedVertex = Vector4.Transform(vectors[i], transform);
                 var transformedVector = transformedVertex / transformedVertex.W;
 
-                transformedVectors.Add(transformedVector);
+                transformedVectors.Add(new Vector3(transformedVector.X, transformedVector.Y, transformedVector.Z));
             }
             return transformedVectors;
         }

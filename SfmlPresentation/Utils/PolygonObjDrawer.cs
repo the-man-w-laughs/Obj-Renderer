@@ -9,25 +9,13 @@ using Transformer.Transpormers;
 
 namespace SfmlPresentation.Utils
 {
-    public class FastObjDrawer : IFastObjDrawer
+    public class PolygonObjDrawer : IPolygonObjDrawer
     {
-        private readonly IDrawer _drawer;
-        private readonly IViewMatrixProvider _viewMatrixProvider;
-        private readonly ICoordinateTransformer _coordinateTransformer;
-        private readonly IProjectionMatrixProvider _projectionMatrixProvider;
-        private readonly IViewportMatrixProvider _viewportMatrixProvider;
+        private readonly ILineDrawer _drawer;
 
-        public FastObjDrawer(IDrawer drawer,
-                             IViewMatrixProvider viewMatrixProvider,
-                             ICoordinateTransformer coordinateTransformer,
-                             IProjectionMatrixProvider projectionMatrixProvider,
-                             IViewportMatrixProvider viewportMatrixProvider)
+        public PolygonObjDrawer(ILineDrawer drawer)
         {
-            _drawer = drawer;
-            _viewMatrixProvider = viewMatrixProvider;
-            _coordinateTransformer = coordinateTransformer;
-            _projectionMatrixProvider = projectionMatrixProvider;
-            _viewportMatrixProvider = viewportMatrixProvider;
+            _drawer = drawer;            
         }
 
         public void Draw(List<Face> faces, List<Vector4> verticesToDraw, Image bitmap, Color color)

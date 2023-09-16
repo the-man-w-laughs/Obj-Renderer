@@ -51,7 +51,7 @@ namespace Business
             return vertices;
         }
 
-        public List<Vector4> ConvertTo2DCoordinates(List<Vector4> vertices, int width, int height, Vector3 eye)
+        public List<Vector3> ConvertTo2DCoordinates(List<Vector4> vertices, int width, int height, Vector3 eye)
         {
             var projectionMatrix = _projectionMatrixProvider.CreatePerspectiveProjectionMatrix(45.0f, (float)width / height, 1.0f, 100.0f);
             var viewportMatrix = _viewportMatrixProvider.CreateProjectionToViewportMatrix(width, height, 0, 0);
