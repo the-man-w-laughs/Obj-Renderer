@@ -91,7 +91,7 @@ public partial class MainWindow
     public void Run()
     {
         AppConfiguration();
-        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\dragon.obj");
+        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\cube.obj");
         CanvasConfiguration(_screenWidth, _screenHeight);
 
         Stopwatch stopwatch = new Stopwatch();

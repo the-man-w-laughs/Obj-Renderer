@@ -53,7 +53,7 @@ namespace Business
 
         public List<Vector3> ConvertTo2DCoordinates(List<Vector3> vertices, int width, int height, Vector3 eye)
         {
-            var finalMatrix = GetFinalMatrix(new Vector3(0,0,0),width, height, eye);
+            var finalMatrix = GetFinalMatrix(width, height, eye);
             var result = vertices.ToList();
             _coordinateTransformer.ApplyTransformAndDivideByW(result, finalMatrix);
             return result;
@@ -61,12 +61,14 @@ namespace Business
 
         public Vector3 ConvertTo2DCoordinates(Vector3 light, int width, int height, Vector3 camera)
         {
-            var finalMatrix = GetFinalMatrix(light, width, height, camera);                        
+            var finalMatrix = GetFinalMatrix(width, height, camera);                        
             return _coordinateTransformer.ApplyTransformAndDivideByW(light, finalMatrix);
         }
 
-        private Matrix4x4 GetFinalMatrix(Vector3 target, int width, int height, Vector3 eye)
+        private Matrix4x4 GetFinalMatrix(int width, int height, Vector3 eye)
         {
+            var target = new Vector3(0, 0, 0);
+
             var projectionMatrix = _projectionMatrixProvider.CreatePerspectiveProjectionMatrix(45.0f, (float)width / height, 1.0f, 100.0f);
             var viewportMatrix = _viewportMatrixProvider.CreateProjectionToViewportMatrix(width, height, 0, 0);
             

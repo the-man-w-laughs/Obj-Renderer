@@ -28,10 +28,11 @@ namespace Transformer.Transpormers
 
         public Vector3 ApplyTransformAndDivideByW(Vector3 vector, Matrix4x4 transform)
         {
-            var transformedVertex = Vector4.Transform(vector, transform);
-            var transformedVector = transformedVertex / transformedVertex.W;
+            var transformedVertex = Vector4.Transform(vector, transform);            
+            if (transformedVertex.W != 0)
+                transformedVertex = transformedVertex / transformedVertex.W;
 
-            return new Vector3(transformedVector.X, transformedVector.Y, transformedVector.Z);
+            return new Vector3(transformedVertex.X, transformedVertex.Y, transformedVertex.Z);
         }
     }
 }
