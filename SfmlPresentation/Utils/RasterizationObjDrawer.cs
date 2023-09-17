@@ -24,7 +24,7 @@ namespace SfmlPresentation.Utils
             this._faceDrawer = faceDrawer;
         }
 
-        public void Draw(List<Face> faces, List<Vector3> verticesToDraw, Image image, Camera light)
+        public void Draw(List<Face> faces, List<Vector3> verticesToDraw, Image image, Vector3 light)
         {        
             foreach (var face in faces)
             {                
@@ -43,7 +43,7 @@ namespace SfmlPresentation.Utils
             };                    
         }
 
-        private Color CalculateLambertianPolygonColor(Vector3[] vertices, Camera light)
+        private Color CalculateLambertianPolygonColor(Vector3[] vertices, Vector3 light)
         {
             if (vertices == null || vertices.Length != 3)
             {
@@ -52,11 +52,9 @@ namespace SfmlPresentation.Utils
             
             Vector3 edge1 = vertices[0] - vertices[1]; 
             Vector3 edge2 = vertices[0] - vertices[2]; 
-            Vector3 normal = Vector3.Normalize(Vector3.Cross(edge1, edge2));
+            Vector3 normal = Vector3.Normalize(Vector3.Cross(edge1, edge2));            
 
-            var eye = light.Eye;
-
-            Vector3 toLight = vertices[0] - eye;
+            Vector3 toLight = light - vertices[0];
             
             float dotProduct = Vector3.Dot(normal, toLight);            
             
@@ -65,7 +63,7 @@ namespace SfmlPresentation.Utils
             
             float cosineTheta = dotProduct / (magnitudeA * magnitudeB);
 
-            float intensity = Math.Max(0.0f, cosineTheta);            
+            float intensity = Math.Max(0.0f, dotProduct);
 
             byte finalIntensity = (byte)(intensity * 255);
 

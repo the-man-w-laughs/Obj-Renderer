@@ -13,6 +13,6 @@ namespace SfmlPresentation.Contracts
     public interface IRasterizationObjDrawer
     {
         Camera Light { get; set; }
-        void Draw(List<Face> faces, List<Vector3> verticesToDraw, Image bitmap, Camera light);
+        void Draw(List<Face> faces, List<Vector3> verticesToDraw, Image bitmap, Vector3 light);
     }
 }

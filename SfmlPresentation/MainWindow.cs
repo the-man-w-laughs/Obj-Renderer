@@ -35,7 +35,11 @@ public partial class MainWindow
         _rasterizationObjDrawer = rasterizationObjDrawer;
     }
 
-    private List<Vector4> _vertices;
+    private List<Vector3> _vertices;
+    private List<Vector3> _oldVertices;
+    private Texture _pixelTexture;
+    private Image _image;
+    private Sprite _pixelSprite;
 
     private int _scale = 1;
 
@@ -54,10 +58,6 @@ public partial class MainWindow
     private uint _screenWidth;
     private uint _screenHeight;
 
-    private Texture _pixelTexture;
-    private Image _image;
-    private Sprite _pixelSprite;
-    private List<Vector3> _oldVertices;
 
 
     void AppConfiguration()
@@ -91,7 +91,7 @@ public partial class MainWindow
     public void Run()
     {
         AppConfiguration();
-        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\cube.obj");
+        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\dragon.obj");
         CanvasConfiguration(_screenWidth, _screenHeight);
 
         Stopwatch stopwatch = new Stopwatch();
@@ -106,10 +106,11 @@ public partial class MainWindow
             //{
             //    _rasterizationObjDrawer.Draw(_obj.FaceList, _oldVertices, _image);
             //}
-
+            
             var verticesToDraw = _transformationHelper.ConvertTo2DCoordinates(_vertices, (int)_screenWidth, (int)_screenHeight, _camera.Eye);
+            var lightToDraw = _transformationHelper.ConvertTo2DCoordinates(_light.Eye, (int)_screenWidth, (int)_screenHeight, _camera.Eye);
             _oldVertices = verticesToDraw.ToList();
-            DrawImage();
+            DrawImage(verticesToDraw, lightToDraw);
 
             stopwatch.Stop();
             var elapsed = stopwatch.ElapsedMilliseconds;
@@ -118,9 +119,9 @@ public partial class MainWindow
         }
     }
 
-    void DrawImage()
+    void DrawImage(List<Vector3> vertices, Vector3 light)
     {
-        _rasterizationObjDrawer.Draw(_obj.FaceList, _oldVertices, _image, _light);
+        _rasterizationObjDrawer.Draw(_obj.FaceList, vertices, _image, light);
         _pixelTexture.Update(_image);
         _app.Draw(_pixelSprite);
         _app.Display();
