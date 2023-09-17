@@ -11,8 +11,7 @@ using System.Threading.Tasks;
 namespace SfmlPresentation.Contracts
 {
     public interface IRasterizationObjDrawer
-    {
-        Camera Light { get; set; }
-        void Draw(List<Face> faces, List<Vector3> verticesToDraw, Image bitmap, Vector3 light);
+    {        
+        void Draw(List<Face> faces, List<Vector3> vertices, Image bitmap, Vector3 camera, Vector3 light);
     }
 }

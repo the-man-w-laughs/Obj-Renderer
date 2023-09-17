@@ -3,7 +3,7 @@ using SFML.Window;
 using SfmlPresentation.Contracts;
 using SfmlPresentation.Scene;
 
-namespace SfmlPresentation.Utils
+namespace SfmlPresentation.Utils.ComponentDrawers
 {
     public class BresenhamDrawer : ILineDrawer
     {

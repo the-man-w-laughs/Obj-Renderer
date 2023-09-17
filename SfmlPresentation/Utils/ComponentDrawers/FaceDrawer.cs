@@ -7,7 +7,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SfmlPresentation.Utils
+namespace SfmlPresentation.Utils.ComponentDrawers
 {
     public class FaceDrawer : IFaceDrawer
     {
@@ -24,15 +24,15 @@ namespace SfmlPresentation.Utils
             {
                 throw new ArgumentException("Vertices must be an array of length 3.");
             }
-            
-            int minY = (int)vertices.Min(v => v.Y);            
+
+            int minY = (int)vertices.Min(v => v.Y);
             int maxY = (int)vertices.Max(v => v.Y);
             if (minY < 0 || maxY > image.Size.Y) return;
 
             for (int y = minY; y <= maxY; y++)
             {
                 List<int> intersections = new List<int>();
-                
+
                 for (int i = 0; i < vertices.Length; i++)
                 {
                     int nextIndex = (i + 1) % vertices.Length;
@@ -40,8 +40,8 @@ namespace SfmlPresentation.Utils
                     int y0 = (int)vertices[i].Y;
                     int x1 = (int)vertices[nextIndex].X;
                     int y1 = (int)vertices[nextIndex].Y;
-                    
-                    if ((y0 <= y && y1 > y) || (y1 <= y && y0 > y))
+
+                    if (y0 <= y && y1 > y || y1 <= y && y0 > y)
                     {
                         try
                         {
@@ -52,7 +52,7 @@ namespace SfmlPresentation.Utils
                         {
 
                         }
-                        
+
                     }
                 }
                 if (intersections.Count() == 2)
@@ -64,7 +64,7 @@ namespace SfmlPresentation.Utils
                         int x1 = intersections[i + 1];
                         DrawLineIfIntersects(image, color, x0, y, x1, y);
                     }
-                }                                             
+                }
             }
         }
         private int GetIntersect(int x0, int y0, int x1, int y1, int y)

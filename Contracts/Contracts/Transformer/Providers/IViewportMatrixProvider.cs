@@ -4,6 +4,6 @@ namespace Business.Contracts.Transformer.Providers
 {
     public interface IViewportMatrixProvider
     {
-        Matrix4x4 CreateProjectionToViewportMatrix(int screenWidth, int screenHeight, float xMin, float yMin);
+        Matrix4x4 CreateProjectionToViewportMatrix(uint screenWidth, uint screenHeight, float xMin, float yMin);
     }
 }

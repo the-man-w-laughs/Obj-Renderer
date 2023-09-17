@@ -16,6 +16,7 @@ using SfmlPresentation.Scene;
 using SFML.System;
 using System.ComponentModel.DataAnnotations;
 using static System.Net.Mime.MediaTypeNames;
+using System.Xml.Linq;
 
 public partial class MainWindow
 {
@@ -40,7 +41,7 @@ public partial class MainWindow
     private Texture _pixelTexture;
     private Image _image;
     private Sprite _pixelSprite;
-
+    
     private int _scale = 1;
 
     private Point _startPoint;
@@ -50,8 +51,9 @@ public partial class MainWindow
     private float _smoothness = 200;
     private float _rSmoothness = 0.7f;
 
-    private Camera _camera = new Camera(Math.PI / 2, 0, 100);
-    private Camera _light = new Camera(Math.PI / 2, 0, 100);
+    private Camera _camera = new Camera(Math.PI / 2, 0, 10);
+    private Camera _light = new Camera(Math.PI / 2, 0, 10);
+    private bool _isSticky = false;
     private Obj _obj;
 
     private RenderWindow _app;
@@ -78,7 +80,7 @@ public partial class MainWindow
     void LoadScene(string path)
     {
         _obj = _objFileParcer.ParseObjFile(path);
-        _vertices = _transformationHelper.ConvertToGlobalCoordinates(_obj, 10, new Vector3(1, 1, 1), 0);
+        _vertices = _transformationHelper.ConvertToGlobalCoordinates(_obj, _scale, (new Vector3(1, 1, 1)), 0);
         _oldVertices = new List<Vector3>();        
     }
 
@@ -102,15 +104,8 @@ public partial class MainWindow
             HandleKeyboardInput();
 
             ClearImage(_image, Color.Black);
-            //if (_oldVertices.Count != 0)
-            //{
-            //    _rasterizationObjDrawer.Draw(_obj.FaceList, _oldVertices, _image);
-            //}
-            
-            var verticesToDraw = _transformationHelper.ConvertTo2DCoordinates(_vertices, (int)_screenWidth, (int)_screenHeight, _camera.Eye);
-            var lightToDraw = _transformationHelper.ConvertTo2DCoordinates(_light.Eye, (int)_screenWidth, (int)_screenHeight, _camera.Eye);
-            _oldVertices = verticesToDraw.ToList();
-            DrawImage(verticesToDraw, lightToDraw);
+
+            DrawImage();
 
             stopwatch.Stop();
             var elapsed = stopwatch.ElapsedMilliseconds;
@@ -119,9 +114,9 @@ public partial class MainWindow
         }
     }
 
-    void DrawImage(List<Vector3> vertices, Vector3 light)
+    void DrawImage()
     {
-        _rasterizationObjDrawer.Draw(_obj.FaceList, vertices, _image, light);
+        _rasterizationObjDrawer.Draw(_obj.FaceList, _vertices, _image, _camera.Eye, _light.Eye);
         _pixelTexture.Update(_image);
         _app.Draw(_pixelSprite);
         _app.Display();
@@ -153,35 +148,78 @@ public partial class MainWindow
         _beta = _camera.Beta;
     }
     void HandleKeyboardInput()
-    {        
-        float deltaX = 0.05f;
-        float deltaY = 0.05f;
-        float deltaR = 1f;
+    {
+        if (Keyboard.IsKeyPressed(Keyboard.Key.Space))
+        {
+            if (!_isSticky)
+            {
+                _isSticky = true;
+                _light = _camera;
+            }
+            else
+            {
+                _isSticky = false;
+                _light = new Camera(_camera.Alpha, _camera.Beta, _camera.R);
+            }
+        }
+
+        float deltaXCamera = 0.05f;
+        float deltaYCamera = 0.05f;
+        float deltaRCamera = 1f;
 
         if (Keyboard.IsKeyPressed(Keyboard.Key.Left))
         {            
-            _camera.ChangeBetaIncrement(-deltaX);
+            _camera.ChangeBetaIncrement(-deltaXCamera);
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.Right))
         {         
-            _camera.ChangeBetaIncrement(deltaX);
+            _camera.ChangeBetaIncrement(deltaXCamera);
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
         {         
-            _camera.ChangeAlphaIncrement(-deltaY);
+            _camera.ChangeAlphaIncrement(-deltaYCamera);
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.Down))
         {         
-            _camera.ChangeAlphaIncrement(deltaY);
+            _camera.ChangeAlphaIncrement(deltaYCamera);
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.LBracket))
         {         
-            _camera.R += deltaR;
+            _camera.R += deltaRCamera;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.RBracket))
         {         
-            _camera.R -= deltaR;
+            _camera.R -= deltaRCamera;
         }
+
+        float deltaXLight = 0.1f;
+        float deltaYLight = 0.1f;
+        float deltaRLight = 1f;
+
+        if (Keyboard.IsKeyPressed(Keyboard.Key.A))
+        {
+            _light.ChangeBetaIncrement(-deltaXLight);
+        }
+        if (Keyboard.IsKeyPressed(Keyboard.Key.D))
+        {
+            _light.ChangeBetaIncrement(deltaXLight);
+        }
+        if (Keyboard.IsKeyPressed(Keyboard.Key.W))
+        {
+            _light.ChangeAlphaIncrement(-deltaYLight);
+        }
+        if (Keyboard.IsKeyPressed(Keyboard.Key.S))
+        {
+            _light.ChangeAlphaIncrement(deltaYLight);
+        }
+        if (Keyboard.IsKeyPressed(Keyboard.Key.Q))
+        {
+            _light.R += deltaRLight;
+        }
+        if (Keyboard.IsKeyPressed(Keyboard.Key.E))
+        {
+            _light.R -= deltaRLight;
+        }     
     }
 
     private void ClearImage(Image image, Color clearColor)

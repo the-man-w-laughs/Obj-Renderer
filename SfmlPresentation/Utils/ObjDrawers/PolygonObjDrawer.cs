@@ -7,7 +7,7 @@ using SfmlPresentation.Contracts;
 using System.Numerics;
 using Transformer.Transpormers;
 
-namespace SfmlPresentation.Utils
+namespace SfmlPresentation.Utils.ObjDrawers
 {
     public class PolygonObjDrawer : IPolygonObjDrawer
     {
@@ -15,7 +15,7 @@ namespace SfmlPresentation.Utils
 
         public PolygonObjDrawer(ILineDrawer drawer)
         {
-            _drawer = drawer;            
+            _drawer = drawer;
         }
 
         public void Draw(List<Face> faces, List<Vector4> verticesToDraw, Image bitmap, Color color)
