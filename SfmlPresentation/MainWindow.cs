@@ -1,38 +1,29 @@
 ﻿using Business.Contracts.Parser;
-using Business.Contracts;
-using Microsoft.Extensions.Logging;
 using SFML.Graphics;
 using SFML.Window;
-using SfmlPresentation;
 using SfmlPresentation.Contracts;
 using System.Drawing;
 using System.Numerics;
 using Image = SFML.Graphics.Image;
 using Color = SFML.Graphics.Color;
-using Business;
 using Domain.ObjClass;
 using System.Diagnostics;
 using SfmlPresentation.Scene;
-using SFML.System;
-using System.ComponentModel.DataAnnotations;
-using static System.Net.Mime.MediaTypeNames;
-using System.Xml.Linq;
+using static SFML.Window.Keyboard;
+using Business.Contracts;
 
 public partial class MainWindow
 {
     private readonly IObjFileParcer _objFileParcer;
-    private readonly ITransformationHelper _transformationHelper;
-    private readonly IPolygonObjDrawer _polygonObjDrawer;
+    private readonly ITransformationHelper _transformationHelper;    
     private readonly IRasterizationObjDrawer _rasterizationObjDrawer;
 
     public MainWindow(IObjFileParcer objFileParcer,
-                      ITransformationHelper transformationHelper,
-                      IPolygonObjDrawer fastObjDrawer,
+                      ITransformationHelper transformationHelper,                      
                       IRasterizationObjDrawer rasterizationObjDrawer)
     {
         this._objFileParcer = objFileParcer;
-        this._transformationHelper = transformationHelper;
-        this._polygonObjDrawer = fastObjDrawer;
+        this._transformationHelper = transformationHelper;        
         _rasterizationObjDrawer = rasterizationObjDrawer;
     }
 
@@ -42,7 +33,7 @@ public partial class MainWindow
     private Image _image;
     private Sprite _pixelSprite;
     
-    private int _scale = 1;
+    private int _scale = 12;
 
     private Point _startPoint;
     private double _alpha;
@@ -51,9 +42,10 @@ public partial class MainWindow
     private float _smoothness = 200;
     private float _rSmoothness = 0.7f;
 
-    private Camera _camera = new Camera(Math.PI / 2, 0, 10);
-    private Camera _light = new Camera(Math.PI / 2, 0, 10);
+    private Camera _camera = new Camera(Math.PI / 2, 0, 7);
+    private Camera _light = new Camera(Math.PI / 2, 0, 7);
     private bool _isSticky = false;
+    private bool[] keyHandled = new bool[(int)Key.KeyCount];
     private Obj _obj;
 
     private RenderWindow _app;
@@ -102,9 +94,7 @@ public partial class MainWindow
             stopwatch.Start();
             _app.DispatchEvents();
             HandleKeyboardInput();
-
-            ClearImage(_image, Color.Black);
-
+            
             DrawImage();
 
             stopwatch.Stop();
@@ -116,6 +106,7 @@ public partial class MainWindow
 
     void DrawImage()
     {
+        ClearImage(Color.Black);
         _rasterizationObjDrawer.Draw(_obj.FaceList, _vertices, _image, _camera.Eye, _light.Eye);
         _pixelTexture.Update(_image);
         _app.Draw(_pixelSprite);
@@ -149,18 +140,23 @@ public partial class MainWindow
     }
     void HandleKeyboardInput()
     {
-        if (Keyboard.IsKeyPressed(Keyboard.Key.Space))
+        if (Keyboard.IsKeyPressed(Keyboard.Key.Space) && !keyHandled[(int)Key.Space])
         {
+            keyHandled[(int)Key.Space] = true;
             if (!_isSticky)
             {
-                _isSticky = true;
-                _light = _camera;
+                _isSticky = true;                             
+                _light = _camera;                
             }
             else
             {
                 _isSticky = false;
-                _light = new Camera(_camera.Alpha, _camera.Beta, _camera.R);
+                _light = new Camera(_camera.Alpha, _camera.Beta, _camera.R);                
             }
+        }
+        else if (!Keyboard.IsKeyPressed(Key.Space))
+        {
+            keyHandled[(int)Key.Space] = false;
         }
 
         float deltaXCamera = 0.05f;
@@ -222,13 +218,13 @@ public partial class MainWindow
         }     
     }
 
-    private void ClearImage(Image image, Color clearColor)
+    private void ClearImage(Color clearColor)
     {
-        for (uint x = 0; x < image.Size.X; x++)
+        for (uint x = 0; x < _image.Size.X; x++)
         {
-            for (uint y = 0; y < image.Size.Y; y++)
+            for (uint y = 0; y < _image.Size.Y; y++)
             {
-                image.SetPixel(x, y, clearColor);
+                _image.SetPixel(x, y, clearColor);
             }
         }
     }

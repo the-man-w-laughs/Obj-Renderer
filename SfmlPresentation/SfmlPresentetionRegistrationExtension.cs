@@ -3,6 +3,7 @@ using Business.Contracts;
 using Business.Contracts.Transformer.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using SfmlPresentation.Contracts;
+using SfmlPresentation.Utils.ColorProviders;
 using SfmlPresentation.Utils.ComponentDrawers;
 using SfmlPresentation.Utils.ObjDrawers;
 using System;
@@ -18,9 +19,9 @@ namespace Parser
         public static void RegisterSfmlPresentationDependencies(this IServiceCollection services)
         {
             services.AddTransient<ILineDrawer, BresenhamDrawer>();
-            services.AddTransient<IFaceDrawer, FaceDrawer>();
-            services.AddTransient<IPolygonObjDrawer, PolygonObjDrawer>();
+            services.AddTransient<IFaceDrawer, FaceDrawer>();            
             services.AddTransient<IRasterizationObjDrawer, RasterizationObjDrawer>();
+            services.AddTransient<IColorProvider, LambertianLightDistribution>();
         }
     }
 }

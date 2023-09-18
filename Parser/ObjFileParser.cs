@@ -99,26 +99,27 @@ public class ObjFileParser : IObjFileParcer
                     {
                         string[] vertexParts = parts[i + 1].Split('/');
 
-                        if (vertexParts.Length >= MinTextureVertexPartsLength)
+                        if (TryParseInt(vertexParts[0], out int vindex))
                         {
-                            if (TryParseInt(vertexParts[0], out int vindex))
+                            f.VertexIndexList[i] = vindex;
+                        }
+                        else
+                        {
+                            throw new ArgumentException("Invalid 'f' line format or int value.");
+                        }
+                        
+                        if (vertexParts.Length > 1)
+                        {
+                            if (TryParseInt(vertexParts[1], out int vtindex))
                             {
-                                f.VertexIndexList[i] = vindex;
+                                f.TextureVertexIndexList[i] = vtindex;
                             }
                             else
                             {
                                 throw new ArgumentException("Invalid 'f' line format or int value.");
                             }
-
-                            if (vertexParts.Length > 1 && TryParseInt(vertexParts[1], out int vtindex))
-                            {
-                                f.TextureVertexIndexList[i] = vtindex;
-                            }
-                        }
-                        else
-                        {
-                            throw new ArgumentException("Invalid 'f' line format.");
-                        }
+                            
+                        }                       
                     }
 
                     f.UseMtl = usemtl;

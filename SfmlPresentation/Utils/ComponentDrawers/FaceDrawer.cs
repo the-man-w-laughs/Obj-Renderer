@@ -1,35 +1,36 @@
-﻿using SFML.Graphics;
+﻿using Business.Contracts.Utils;
+using SFML.Graphics;
 using SfmlPresentation.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using SfmlPresentation.Utils.Buffer;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SfmlPresentation.Utils.ComponentDrawers
 {
     public class FaceDrawer : IFaceDrawer
     {
-        private readonly ILineDrawer lineDrawer;
+        private readonly ILineDrawer lineDrawer;        
 
         public FaceDrawer(ILineDrawer lineDrawer)
         {
             this.lineDrawer = lineDrawer;
         }
 
-        public void DrawFace(Image image, Color color, Vector3[] vertices)
+        public void DrawFace(Image image, Color color, Vector3[] vertices, IZBuffer zBuffer)
         {
             if (vertices == null || vertices.Length < 3)
             {
                 throw new ArgumentException("Vertices must be an array of length 3.");
             }
 
-            int minY = (int)vertices.Min(v => v.Y);
-            int maxY = (int)vertices.Max(v => v.Y);
-            if (minY < 0 || maxY > image.Size.Y) return;
-
-            for (int y = minY; y <= maxY; y++)
+            var minY = (int)vertices.Min(v => v.Y);            
+            var maxY = (int)vertices.Max(v => v.Y);
+            if (minY < 0 && maxY > image.Size.Y) return;
+            if (maxY > image.Size.Y) 
+                maxY = (int)image.Size.Y;
+            if (minY < 0) 
+                minY = 0;
+            if (minY > maxY) return;
+            for (var y = minY; y <= maxY; y++)
             {
                 List<int> intersections = new List<int>();
 
@@ -45,7 +46,7 @@ namespace SfmlPresentation.Utils.ComponentDrawers
                     {
                         try
                         {
-                            int xIntersect = GetIntersect(x0, y0, x1, y1, y);
+                            int xIntersect = GetIntersect(x0, y0, x1, y1, (int)y);
                             intersections.Add(xIntersect);
                         }
                         catch
@@ -62,7 +63,7 @@ namespace SfmlPresentation.Utils.ComponentDrawers
                     {
                         int x0 = intersections[i];
                         int x1 = intersections[i + 1];
-                        DrawLineIfIntersects(image, color, x0, y, x1, y);
+                        DrawLineIfIntersects(image, color, x0, (int)y, x1, (int)y, zBuffer);
                     }
                 }
             }
@@ -73,7 +74,7 @@ namespace SfmlPresentation.Utils.ComponentDrawers
             {
                 throw new InvalidOperationException("Lines are parallel, and there is no intersection.");
             }
-            int x = x0 + (x1 - x0) * (y - y0) / (y1 - y0);
+            var x = x0 + (x1 - x0) * (y - y0) / (y1 - y0);
 
             if (x < Math.Min(x0, x1) || x > Math.Max(x0, x1))
             {
@@ -82,17 +83,20 @@ namespace SfmlPresentation.Utils.ComponentDrawers
             return x;
         }
 
-        private void DrawLineIfIntersects(Image image, Color color, int startX, int startY, int endX, int endY)
+        private void DrawLineIfIntersects(Image image, Color color, int startX, int startY, int endX, int endY, IZBuffer buffer)
         {
             var bitmapWidth = image.Size.X;
             var bitmapHeight = image.Size.Y;
 
+            if (startX < 0) startX = 0;
+            if (endX > bitmapWidth) endX = startX;
+
             if (startX >= 0 && startY >= 0 && startX < bitmapWidth && startY < bitmapHeight
                 && endX >= 0 && endY >= 0 && endX < bitmapWidth && endY < bitmapHeight)
             {
-                lineDrawer.DrawLine(image, color, startX, startY, endX, endY);
+
+                lineDrawer.DrawLine(image, color, (uint)startX, (uint)startY, (uint)endX, (uint)endY, buffer);
             }
         }
-
     }
 }

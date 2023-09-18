@@ -1,10 +1,11 @@
-﻿using SFML.Graphics;
+﻿using Business.Contracts.Utils;
+using SFML.Graphics;
 using System.Numerics;
 
 namespace SfmlPresentation.Contracts
 {
     public interface ILineDrawer
     {
-        void DrawLine(Image bitmap, Color color, int x0, int y0, int x1, int y1);        
+        public void DrawLine(Image image, Color color, uint x0, uint y0, uint x1, uint y1, IZBuffer zBuffer);
     }
 }

@@ -9,9 +9,10 @@ using static System.Formats.Asn1.AsnWriter;
 using Transformer.Transpormers;
 using System.Transactions;
 using Business.Contracts.Transformer.Providers;
+using Business.Contracts.Utils;
 using Business.Contracts;
 
-namespace Business
+namespace Business.Utils
 {
     public class TransformationHelper : ITransformationHelper
     {
@@ -23,7 +24,7 @@ namespace Business
 
         public TransformationHelper(ICoordinateTransformer coordinateTransformer,
                                     ITransformationMatrixProvider transformationMatrixProvider,
-                                    IViewMatrixProvider viewMatrixProvider,                             
+                                    IViewMatrixProvider viewMatrixProvider,
                                     IProjectionMatrixProvider projectionMatrixProvider,
                                     IViewportMatrixProvider viewportMatrixProvider)
         {
@@ -61,7 +62,7 @@ namespace Business
 
         public Vector3 ConvertTo2DCoordinates(Vector3 target, uint width, uint height, Vector3 camera)
         {
-            var finalMatrix = GetFinalMatrix(width, height, camera);                        
+            var finalMatrix = GetFinalMatrix(width, height, camera);
             return _coordinateTransformer.ApplyTransformAndDivideByW(target, finalMatrix);
         }
 
@@ -71,7 +72,7 @@ namespace Business
 
             var projectionMatrix = _projectionMatrixProvider.CreatePerspectiveProjectionMatrix(45.0f, (float)width / height, 1.0f, 100.0f);
             var viewportMatrix = _viewportMatrixProvider.CreateProjectionToViewportMatrix(width, height, 0, 0);
-            
+
             var up = new Vector3(0, 1, 0);
             var viewMatrix = _viewMatrixProvider.WorldToViewMatrix(eye, target, up);
 

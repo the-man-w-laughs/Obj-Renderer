@@ -12,6 +12,9 @@ A lightweight OBJ file renderer written in C# using the SFML library. This proje
 - SFML-based presentation for 3D visualization
 - Manual matrix transformation for manipulating models
 - Camera Position Adjustment
+- Lambertian light distribution model
+- Light Position Adjustment
+- Z-Buffer
 - Dependency injection for flexibility and modularity
 
 ### Manual Matrix Transformation
