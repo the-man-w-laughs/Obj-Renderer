@@ -1,4 +1,6 @@
-﻿using SFML.Graphics;
+﻿using Business.Contracts;
+using Business.Contracts.Utils;
+using SFML.Graphics;
 using SfmlPresentation.Contracts;
 using System;
 using System.Collections.Generic;
@@ -11,18 +13,30 @@ namespace SfmlPresentation.Utils.ColorProviders
 {
     public class LambertianLightDistribution : IColorProvider
     {
-        public Color GetColor(Vector3[] vertices, Vector3 light)
+        private readonly ITransformationHelper _transformationHelper;
+
+        public LambertianLightDistribution(ITransformationHelper transformationHelper)
+        {
+            this._transformationHelper = transformationHelper;
+        }
+        public Color GetColor(Vector3[] vertices, Vector3 light, IZBuffer zBuffer)
         {
             if (vertices == null || vertices.Length != 3)
             {
                 throw new ArgumentException("Vertices must be an array of length 3.");
             }
+            var center = CalculateTriangleCentroid(vertices[0], vertices[1], vertices[2]);
+
+            var centerFromLight = _transformationHelper.ConvertTo2DCoordinates(center, zBuffer.Width, zBuffer.Height, light);
+
+            if (!zBuffer.TryPoint(centerFromLight))
+                return new Color(0, 0, 0);
 
             Vector3 edge1 = vertices[0] - vertices[1];
             Vector3 edge2 = vertices[0] - vertices[2];
             Vector3 normal = Vector3.Normalize(Vector3.Cross(edge1, edge2));
 
-            Vector3 toLight = light - CalculateTriangleCentroid(vertices[0], vertices[1], vertices[2]);
+            Vector3 toLight = light - center;
 
             float dotProduct = Vector3.Dot(normal, toLight);
 

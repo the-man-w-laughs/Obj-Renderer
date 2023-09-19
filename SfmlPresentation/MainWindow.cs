@@ -33,7 +33,7 @@ public partial class MainWindow
     private Image _image;
     private Sprite _pixelSprite;
     
-    private int _scale = 12;
+    private int _scale = 1;
 
     private Point _startPoint;
     private double _alpha;
@@ -63,10 +63,22 @@ public partial class MainWindow
         _app.MouseMoved += _app_MouseMoved;        
         _app.MouseButtonReleased += _app_MouseButtonReleased;
         _app.MouseWheelMoved += _app_MouseWheelMoved;
+        _app.Resized += _app_Resized;
         _isDown = false;
 
         _screenWidth = desktopMode.Width;
         _screenHeight = desktopMode.Height;
+    }
+
+    private void _app_Resized(object? sender, SizeEventArgs e)
+    {
+        _screenWidth = e.Width;
+        _screenHeight = e.Height;
+
+        FloatRect visibleArea = new FloatRect(0, 0, _screenWidth, _screenHeight);
+        _app.SetView(new View(visibleArea));
+
+        CanvasConfiguration(_screenWidth, _screenHeight);        
     }
 
     void LoadScene(string path)
@@ -85,7 +97,7 @@ public partial class MainWindow
     public void Run()
     {
         AppConfiguration();
-        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\dragon.obj");
+        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\cube.obj");
         CanvasConfiguration(_screenWidth, _screenHeight);
 
         Stopwatch stopwatch = new Stopwatch();
