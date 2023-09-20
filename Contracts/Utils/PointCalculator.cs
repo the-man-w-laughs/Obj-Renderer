@@ -25,7 +25,7 @@ namespace SfmlPresentation.Utils
 
             if (Math.Abs(normal.X) < float.Epsilon && Math.Abs(normal.Y) < float.Epsilon)
             {                
-                return Vector3.Zero;
+                return new Vector3(X, Y, 0);
             }            
             float u = ((X - vector1.X) * normal.X + (Y - vector1.Y) * normal.Y - vector1.Z * normal.Z) /
                       (normal.X * vector2.X + normal.Y * vector2.Y - normal.Z * vector2.Z);
