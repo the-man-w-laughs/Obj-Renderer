@@ -77,6 +77,17 @@ namespace SfmlPresentation.Utils.ObjDrawers
                                 
                 _faceDrawer.DrawFace(image, color, verticesToDraw, zBuffer);
             };
+
+            //for (var i = 0; i < zBuffer.Width; i++)
+            //{
+            //    for (var j = 0; j < zBuffer.Height; j++)
+            //    {
+            //        if (zBuffer.Buffer[i,j] != shadowMap.Buffer[i,j])
+            //        {
+            //            throw new Exception($"{zBuffer.Buffer[i, j]} != {shadowMap.Buffer[i, j]}");
+            //        }
+            //    }
+            //}
             var a = new Vector3[3];
         }
 

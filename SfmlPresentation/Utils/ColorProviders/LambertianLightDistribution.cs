@@ -29,8 +29,15 @@ namespace SfmlPresentation.Utils.ColorProviders
 
             var centerFromLight = _transformationHelper.ConvertTo2DCoordinates(center, zBuffer.Width, zBuffer.Height, light);
 
-            if (!zBuffer.TryPoint(centerFromLight))
-                return new Color(0, 0, 0);
+            var verticesTest = new Vector3[3];
+            for (int i = 0; i < 3; i++)
+            {
+                verticesTest[i] = _transformationHelper.ConvertTo2DCoordinates(vertices[i], zBuffer.Width, zBuffer.Height, light);
+            }
+            IPointCalculator pointCalculator = new PointCalculator(verticesTest);
+            var result = pointCalculator.CalculatePointOnPlane(centerFromLight.X, centerFromLight.Y);
+
+            if (!zBuffer.TryPoint(centerFromLight)) return new Color(0, 0, 0);
 
             Vector3 edge1 = vertices[0] - vertices[1];
             Vector3 edge2 = vertices[0] - vertices[2];
