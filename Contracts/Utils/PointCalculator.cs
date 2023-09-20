@@ -1,4 +1,5 @@
 ﻿using Business.Contracts.Utils;
+using System.Drawing.Drawing2D;
 using System.Numerics;
 
 namespace SfmlPresentation.Utils
@@ -20,13 +21,17 @@ namespace SfmlPresentation.Utils
             Vector3 vector2 = vertices[1];
             Vector3 vector3 = vertices[2];
 
-            Vector3 vector1To2 = new Vector3(vector2.X - vector1.X, vector2.Y - vector1.Y, vector2.Z - vector1.Z);
-            Vector3 vector1To3 = new Vector3(vector3.X - vector1.X, vector3.Y - vector1.Y, vector3.Z - vector1.Z);
+            Vector3 normal = Vector3.Cross(vector2 - vector1, vector3 - vector1);
 
-            float u = (X - vector1.X) / vector1To2.X;
-            float v = (Y - vector1.Y) / vector1To2.Y;
+            if (Math.Abs(normal.X) < float.Epsilon && Math.Abs(normal.Y) < float.Epsilon)
+            {                
+                return Vector3.Zero;
+            }            
+            float u = ((X - vector1.X) * normal.X + (Y - vector1.Y) * normal.Y - vector1.Z * normal.Z) /
+                      (normal.X * vector2.X + normal.Y * vector2.Y - normal.Z * vector2.Z);
+            float v = (X - vector1.X - u * vector2.X) / vector3.X;
 
-            float interpolatedZ = vector1.Z + u * vector1To2.Z + v * vector1To3.Z;
+            float interpolatedZ = vector1.Z + u * vector2.Z + v * vector3.Z;
 
             return new Vector3(X, Y, interpolatedZ);
         }

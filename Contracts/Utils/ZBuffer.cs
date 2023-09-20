@@ -38,8 +38,8 @@ namespace SfmlPresentation.Utils.Buffer
 
         public bool SetPoint(uint x, uint y)
         {
-            var z = _pointCalculator.CalculatePointOnPlane(x, y).Z;
-            if (x >= 0 && x < Width && y >= 0 && y < Height && z < buffer[x, y])
+            var z = _pointCalculator.CalculatePointOnPlane(x, y).Z;            
+            if (x >= 0 && x < Width && y >= 0 && y < Height && z <= buffer[x, y])
             {
                 buffer[x, y] = z;
                 return true;
