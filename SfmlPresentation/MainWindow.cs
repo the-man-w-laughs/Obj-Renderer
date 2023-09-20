@@ -33,7 +33,7 @@ public partial class MainWindow
     private Image _image;
     private Sprite _pixelSprite;
     
-    private int _scale = 12;
+    private int _scale = 1;
 
     private Point _startPoint;
     private double _alpha;
@@ -85,7 +85,7 @@ public partial class MainWindow
     public void Run()
     {
         AppConfiguration();
-        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\dragon.obj");
+        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\cube.obj");
         CanvasConfiguration(_screenWidth, _screenHeight);
 
         Stopwatch stopwatch = new Stopwatch();
