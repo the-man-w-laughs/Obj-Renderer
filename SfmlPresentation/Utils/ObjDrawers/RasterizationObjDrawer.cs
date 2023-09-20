@@ -77,7 +77,6 @@ namespace SfmlPresentation.Utils.ObjDrawers
                                 
                 _faceDrawer.DrawFace(image, color, verticesToDraw, zBuffer);
             };
-            var a = new Vector3[3];
         }
 
         private bool IsClockwise(Vector3[] vertices)
