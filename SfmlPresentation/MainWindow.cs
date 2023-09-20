@@ -33,7 +33,7 @@ public partial class MainWindow
     private Image _image;
     private Sprite _pixelSprite;
 
-    private int _scale = 1;  
+    private int _scale = 12;  
 
     private Camera _camera = new Camera(Math.PI / 2, 0, 7);
     private Camera _light = new Camera(Math.PI / 2, 0, 7);
@@ -107,7 +107,7 @@ public partial class MainWindow
     public void Run()
     {
         AppConfiguration();
-        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\cube.obj");
+        LoadScene(@"D:\Projects\7thSem\Graphics\Renderer\Tests\Parser\TestData\dragon.obj");
         CanvasConfiguration(_screenWidth, _screenHeight);
 
         var stopwatch = new Stopwatch();
@@ -119,7 +119,7 @@ public partial class MainWindow
             _app.DispatchEvents();
             HandleKeyboardInput();
             
-            if (_isMoving) 
+            //if (_isMoving) 
                 DrawImage();
             _isMoving = false;
             

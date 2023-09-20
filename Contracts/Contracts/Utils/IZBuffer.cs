@@ -7,6 +7,7 @@ namespace Business.Contracts.Utils
         IPointCalculator PointCalculator { set; }
         uint Width { get; }
         uint Height { get; }
+        float[,] Buffer { get; set; }
 
         bool TryPoint(Vector3 vector);
         bool SetPoint(uint x, uint y);

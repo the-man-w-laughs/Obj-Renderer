@@ -29,8 +29,7 @@ namespace SfmlPresentation.Utils.ColorProviders
 
             var centerFromLight = _transformationHelper.ConvertTo2DCoordinates(center, zBuffer.Width, zBuffer.Height, light);
 
-            if (!zBuffer.TryPoint(centerFromLight))
-                return new Color(0, 0, 0);
+            if (!zBuffer.TryPoint(centerFromLight)) return new Color(0, 0, 0);
 
             Vector3 edge1 = vertices[0] - vertices[1];
             Vector3 edge2 = vertices[0] - vertices[2];
