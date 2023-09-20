@@ -10,36 +10,28 @@ namespace Transformer.Transpormers
 {
     public class CoordinateTransformer: ICoordinateTransformer
     {
-        public void ApplyTransform(List<Vector4> vectors, Matrix4x4 transform)
+        public void ApplyTransform(List<Vector3> vectors, Matrix4x4 transform)
         {
             for (int i = 0; i < vectors.Count; i++)
             {
-                vectors[i] = Vector4.Transform(vectors[i], transform);
+                vectors[i] = Vector3.Transform(vectors[i], transform);
             }
         }
 
-        public List<Vector4> ApplyTransformAndDivideByWAndCopy(List<Vector4> vectors, Matrix4x4 transform)
-        {
-
-            List<Vector4> transformedVectors = new List<Vector4>();
-
+        public void ApplyTransformAndDivideByW(List<Vector3> vectors, Matrix4x4 transform)
+        {           
             for (int i = 0; i < vectors.Count; i++)
             {
-                var transformedVertex = Vector4.Transform(vectors[i], transform);
-                var transformedVector = transformedVertex / transformedVertex.W;
-
-                transformedVectors.Add(transformedVector);
-            }
-            return transformedVectors;
-        }
-        public List<Vector4> ApplyTransformAndCopy(List<Vector4> vectors, Matrix4x4 transform)
-        {
-            return vectors.Select(v => Vector4.Transform(v, transform)).ToList();            
+                vectors[i] = ApplyTransformAndDivideByW(vectors[i], transform);
+            }            
         }
 
-        public List<Vector4> DivideByW(List<Vector4> vectors)
+        public Vector3 ApplyTransformAndDivideByW(Vector3 vector, Matrix4x4 transform)
         {
-            return vectors.Select(v => new Vector4(v.X / v.W, v.Y / v.W, v.Z / v.W, 1)).ToList();
+            var transformedVertex = Vector4.Transform(vector, transform);
+            var transformedVector = transformedVertex / transformedVertex.W;
+
+            return new Vector3(transformedVector.X, transformedVector.Y, transformedVector.Z);
         }
     }
 }

@@ -31,9 +31,8 @@ namespace SFMLPixelDrawing
             .ConfigureServices((context, services) => {
                 services.RegisterParserDependencies();
                 services.RegisterTransformerDependencies();
-                services.RegisterBusinessDependencies();                                
-                services.AddTransient<IDrawer, BresenhamDrawer>();
-                services.AddTransient<IFastObjDrawer, FastObjDrawer>();
+                services.RegisterBusinessDependencies();
+                services.RegisterSfmlPresentationDependencies();
                 services.AddTransient<MainWindow>();
             });
     }

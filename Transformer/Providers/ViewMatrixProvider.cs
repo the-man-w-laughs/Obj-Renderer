@@ -8,6 +8,7 @@ namespace Transformer.Providers
     {
         public Matrix4x4 WorldToViewMatrix(Vector3 eye, Vector3 target, Vector3 up)
         {
+            if (eye - target == Vector3.Zero) return Matrix4x4.Identity;
             Vector3 zaxis = Vector3.Normalize(eye - target);
             Vector3 xaxis = Vector3.Normalize(Vector3.Cross(up, zaxis));
             Vector3 yaxis = Vector3.Cross(zaxis, xaxis);

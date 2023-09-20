@@ -9,9 +9,10 @@ using static System.Formats.Asn1.AsnWriter;
 using Transformer.Transpormers;
 using System.Transactions;
 using Business.Contracts.Transformer.Providers;
+using Business.Contracts.Utils;
 using Business.Contracts;
 
-namespace Business
+namespace Business.Utils
 {
     public class TransformationHelper : ITransformationHelper
     {
@@ -23,7 +24,7 @@ namespace Business
 
         public TransformationHelper(ICoordinateTransformer coordinateTransformer,
                                     ITransformationMatrixProvider transformationMatrixProvider,
-                                    IViewMatrixProvider viewMatrixProvider,                             
+                                    IViewMatrixProvider viewMatrixProvider,
                                     IProjectionMatrixProvider projectionMatrixProvider,
                                     IViewportMatrixProvider viewportMatrixProvider)
         {
@@ -34,7 +35,7 @@ namespace Business
             _viewportMatrixProvider = viewportMatrixProvider;
         }
 
-        public List<Vector4> ConvertToGlobalCoordinates(Obj obj, int scale, Vector3 rotationAxis, int rotationAngleDegrees)
+        public List<Vector3> ConvertToGlobalCoordinates(Obj obj, int scale, Vector3 rotationAxis, int rotationAngleDegrees)
         {
             // Define transformation parameters            
             var scaleVector = scale * new Vector3(1, 1, 1);
@@ -46,23 +47,36 @@ namespace Business
             var scaleMatrix = _transformationMatrixProvider.CreateScaleMatrix(scaleVector.X, scaleVector.Y, scaleVector.Z);
             var rotationMatrix = _transformationMatrixProvider.CreateRotationMatrix(rotationAxis, rotationAngleDegrees);
             var modelMatrix = translationMatrix * rotationMatrix * scaleMatrix;
-            var vertices = obj.VertexList.Select(v => new Vector4(v.X, v.Y, v.Z, 1)).ToList();
+            var vertices = obj.VertexList.ToList();
             _coordinateTransformer.ApplyTransform(vertices, modelMatrix);
             return vertices;
         }
 
-        public List<Vector4> ConvertTo2DCoordinates(List<Vector4> vertices, int width, int height, Vector3 eye)
+        public List<Vector3> ConvertTo2DCoordinates(List<Vector3> vertices, uint width, uint height, Vector3 eye)
         {
+            var finalMatrix = GetFinalMatrix(width, height, eye);
+            var result = vertices.ToList();
+            _coordinateTransformer.ApplyTransformAndDivideByW(result, finalMatrix);
+            return result;
+        }
+
+        public Vector3 ConvertTo2DCoordinates(Vector3 target, uint width, uint height, Vector3 camera)
+        {
+            var finalMatrix = GetFinalMatrix(width, height, camera);
+            return _coordinateTransformer.ApplyTransformAndDivideByW(target, finalMatrix);
+        }
+
+        private Matrix4x4 GetFinalMatrix(uint width, uint height, Vector3 eye)
+        {
+            var target = new Vector3(0, 0, 0);
+
             var projectionMatrix = _projectionMatrixProvider.CreatePerspectiveProjectionMatrix(45.0f, (float)width / height, 1.0f, 100.0f);
             var viewportMatrix = _viewportMatrixProvider.CreateProjectionToViewportMatrix(width, height, 0, 0);
 
-            var target = new Vector3(0, 0, 0);
             var up = new Vector3(0, 1, 0);
             var viewMatrix = _viewMatrixProvider.WorldToViewMatrix(eye, target, up);
 
-            var finalMatrix = viewMatrix * projectionMatrix * viewportMatrix;
-
-            return _coordinateTransformer.ApplyTransformAndDivideByWAndCopy(vertices, finalMatrix);
+            return viewMatrix * projectionMatrix * viewportMatrix;
         }
     }
 }

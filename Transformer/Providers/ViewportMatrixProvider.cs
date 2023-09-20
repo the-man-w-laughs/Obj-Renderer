@@ -10,7 +10,7 @@ namespace Transformer.Providers
 {
     public class ViewportMatrixProvider : IViewportMatrixProvider
     {
-        public Matrix4x4 CreateProjectionToViewportMatrix(int screenWidth, int screenHeight, float xMin, float yMin)
+        public Matrix4x4 CreateProjectionToViewportMatrix(uint screenWidth, uint screenHeight, float xMin, float yMin)
         {            
             Matrix4x4 viewportMatrix = new Matrix4x4(
                 screenWidth / 2, 0, 0, xMin + screenWidth / 2,

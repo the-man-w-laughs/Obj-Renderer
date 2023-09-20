@@ -1,12 +1,6 @@
-﻿using Business;
-using Business.Contracts;
-using Business.Contracts.Transformer.Providers;
+﻿using Business.Contracts;
+using Business.Utils;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Parser
 {
@@ -14,7 +8,7 @@ namespace Parser
     {
         public static void RegisterBusinessDependencies(this IServiceCollection services)
         {           
-            services.AddSingleton<ITransformationHelper, TransformationHelper>();
+            services.AddTransient<ITransformationHelper, TransformationHelper>();
         }
     }
 }
