@@ -47,19 +47,21 @@ public partial class MainWindow
 
 
     private long _elapsedTicks;
-    private Point _startPosition;
-
+    private long _elapsedMilliseconds;
+    private Point _startPosition;    
     private bool _isDown;
 
-    private float _Smoothness = 0.001f;
-    private float _rSmoothness = 0.01f;
-    
-    private float _lightSmoothnessX = 0.0000005f;
-    private float _lightSmoothnessY = 0.0000005f;
-    private float _lightSmoothnessR = 0.0000001f;
-    private float _cameraSmoothnessX = 0.0000002f;
-    private float _cameraSmoothnessY = 0.0000002f;
-    private float _cameraSmoothnessR = 0.0000001f;
+    private float _Smoothness = 0.004f;
+    private float _rSmoothness = 1f;
+
+    private float _multiplyer = 0.0001f;
+
+    private float _lightSmoothnessX = 0.005f;
+    private float _lightSmoothnessY = 0.005f;
+    private float _lightSmoothnessR = 0.02f;
+    private float _cameraSmoothnessX = 0.002f;
+    private float _cameraSmoothnessY = 0.002f;
+    private float _cameraSmoothnessR = 0.01f;
     private bool _isMoving = true;
 
     void AppConfiguration()
@@ -71,7 +73,7 @@ public partial class MainWindow
         _app.MouseButtonPressed += App_MouseButtonPressed;
         _app.MouseMoved += _app_MouseMoved;        
         _app.MouseButtonReleased += _app_MouseButtonReleased;
-        _app.MouseWheelMoved += _app_MouseWheelMoved;
+        _app.MouseWheelScrolled += _app_MouseWheelScrolled;
         _isDown = false;
         _app.Resized += _app_Resized;
         _screenWidth = desktopMode.Width;
@@ -112,7 +114,7 @@ public partial class MainWindow
         while (_app.IsOpen)
         {
             _elapsedTicks = stopwatch.ElapsedTicks;
-            var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+            _elapsedMilliseconds = stopwatch.ElapsedMilliseconds;            
             stopwatch.Restart();
             _app.DispatchEvents();
             HandleKeyboardInput();
@@ -121,9 +123,9 @@ public partial class MainWindow
                 DrawImage();
             _isMoving = false;
             
-            if (elapsedMilliseconds > 0)
+            if (_elapsedMilliseconds > 0)
             {
-                Console.WriteLine($"FPS: {(elapsedMilliseconds != 0 ? (1000.0f / elapsedMilliseconds).ToString() : "inf")} ({elapsedMilliseconds} ms/frame);");            
+                Console.WriteLine($"FPS: {(_elapsedMilliseconds != 0 ? (1000.0f / _elapsedMilliseconds).ToString() : "inf")} ({_elapsedMilliseconds} ms/frame);");            
             }
         }
     }
@@ -137,11 +139,11 @@ public partial class MainWindow
         _app.Display();     
     }
 
-    private void _app_MouseWheelMoved(object? sender, MouseWheelEventArgs e)
-    {        
-        _camera.R += - e.Delta * _elapsedTicks * _rSmoothness;
+    private void _app_MouseWheelScrolled(object? sender, MouseWheelScrollEventArgs e)
+    {
+        _camera.R += -e.Delta * _rSmoothness;
         _isMoving = true;
-    }
+    }    
 
     private void _app_MouseButtonReleased(object? sender, MouseButtonEventArgs e)
     {
@@ -153,11 +155,11 @@ public partial class MainWindow
         if (!_isDown) return;    
         var newPosition = new Point(e.X, e.Y);
         var deltaX = _startPosition.X - newPosition.X;
-        var deltaY = _startPosition.X - newPosition.Y;
+        var deltaY = _startPosition.Y - newPosition.Y;
         _startPosition = newPosition;
-           
-        _camera.Alpha += deltaY * _elapsedTicks * _Smoothness;
-        _camera.ChangeBetaIncrement(deltaX * _elapsedTicks * _Smoothness);
+
+        _camera.Alpha += deltaY * _Smoothness;
+        _camera.ChangeBetaIncrement(deltaX * _Smoothness);
         _isMoving = true;       
     }
 
@@ -190,63 +192,63 @@ public partial class MainWindow
 
         if (Keyboard.IsKeyPressed(Keyboard.Key.Left))
         {            
-            _camera.ChangeBetaIncrement(_elapsedTicks * - _cameraSmoothnessX);
+            _camera.ChangeBetaIncrement(_elapsedTicks * _multiplyer * - _cameraSmoothnessX);
             _isMoving = true;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.Right))
         {         
-            _camera.ChangeBetaIncrement(_elapsedTicks * _cameraSmoothnessX);
+            _camera.ChangeBetaIncrement(_elapsedTicks * _multiplyer * _cameraSmoothnessX);
             _isMoving = true;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
         {         
-            _camera.ChangeAlphaIncrement(_elapsedTicks * - _cameraSmoothnessY);
+            _camera.ChangeAlphaIncrement(_elapsedTicks * _multiplyer * - _cameraSmoothnessY);
             _isMoving = true;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.Down))
         {         
-            _camera.ChangeAlphaIncrement(_elapsedTicks * _cameraSmoothnessY);
+            _camera.ChangeAlphaIncrement(_elapsedTicks * _multiplyer * _cameraSmoothnessY);
             _isMoving = true;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.LBracket))
         {         
-            _camera.R += _elapsedTicks * _cameraSmoothnessR;
+            _camera.R += _elapsedTicks * _multiplyer * _cameraSmoothnessR;
             _isMoving = true;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.RBracket))
         {         
-            _camera.R -= _elapsedTicks * _cameraSmoothnessR;
+            _camera.R -= _elapsedTicks * _multiplyer * _cameraSmoothnessR;
             _isMoving = true;
         }
 
         if (Keyboard.IsKeyPressed(Keyboard.Key.A))
         {
-            _light.ChangeBetaIncrement(_elapsedTicks * - _lightSmoothnessX);
+            _light.ChangeBetaIncrement(_elapsedTicks * _multiplyer * - _lightSmoothnessX);
             _isMoving = true;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.D))
         {
-            _light.ChangeBetaIncrement(_elapsedTicks * _lightSmoothnessX);
+            _light.ChangeBetaIncrement(_elapsedTicks * _multiplyer * _lightSmoothnessX);
             _isMoving = true;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.W))
         {
-            _light.ChangeAlphaIncrement(_elapsedTicks * - _lightSmoothnessY);
+            _light.ChangeAlphaIncrement(_elapsedTicks * _multiplyer * - _lightSmoothnessY);
             _isMoving = true;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.S))
         {
-            _light.ChangeAlphaIncrement(_elapsedTicks * _lightSmoothnessY);
+            _light.ChangeAlphaIncrement(_elapsedTicks * _multiplyer * _lightSmoothnessY);
             _isMoving = true;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.Q))
         {
-            _light.R += _elapsedTicks * _lightSmoothnessR;
+            _light.R += _elapsedTicks * _multiplyer * _lightSmoothnessR;
             _isMoving = true;
         }
         if (Keyboard.IsKeyPressed(Keyboard.Key.E))
         {
-            _light.R -= _elapsedTicks * _lightSmoothnessR;
+            _light.R -= _elapsedTicks * _multiplyer * _lightSmoothnessR;
             _isMoving = true;
         }     
     }
