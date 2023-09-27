@@ -2,6 +2,7 @@
 using Business.Contracts.Utils;
 using SFML.Graphics;
 using SfmlPresentation.Contracts;
+using SfmlPresentation.Scene;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,36 +14,46 @@ namespace SfmlPresentation.Utils.ColorProviders
 {
     public class LambertianLightDistribution : IColorProvider
     {
-        private readonly ITransformationHelper _transformationHelper;
+        private readonly Vector3 camera;
+        private readonly Vector3 light;
+        private readonly Matrix4x4 inversedMatrix;
+        private Vector3 _normal;
 
-        public LambertianLightDistribution(ITransformationHelper transformationHelper)
+        public LambertianLightDistribution(Vector3 camera, Vector3 light, Matrix4x4 finalMatrix)
         {
-            this._transformationHelper = transformationHelper;
+            this.camera = camera;
+            this.light = light;
+            Matrix4x4.Invert(finalMatrix, out inversedMatrix);
         }
-        public Color GetColor(Vector3[] vertices, Vector3 light, IZBuffer zBuffer)
+
+        public Vector3 Normal
         {
-            if (vertices == null || vertices.Length != 3)
+            set
             {
-                throw new ArgumentException("Vertices must be an array of length 3.");
+                _normal = Vector3.Normalize(value);
             }
-            var center = CalculateTriangleCentroid(vertices[0], vertices[1], vertices[2]);
+        }
+        public void SetNormal(Vector3 normal)
+        {
+            _normal = Vector3.Normalize(normal);
+        }
 
-            var centerFromLight = _transformationHelper.ConvertTo2DCoordinates(center, zBuffer.Width, zBuffer.Height, light);
-
-            if (!zBuffer.TryPoint(centerFromLight)) return new Color(0, 0, 0);
-
+        public void SetNormal(Vector3[] vertices)
+        {
             Vector3 edge1 = vertices[0] - vertices[1];
             Vector3 edge2 = vertices[0] - vertices[2];
-            Vector3 normal = Vector3.Normalize(Vector3.Cross(edge1, edge2));
+            _normal = Vector3.Normalize(Vector3.Cross(edge1, edge2));
+        }
 
-            Vector3 toLight = light - center;
+        public Color GetColor(Vector3 point)
+        {
+            Vector3 toLight = light - _normal;
 
-            float dotProduct = Vector3.Dot(normal, toLight);
-
-            float magnitudeA = normal.Length();
+            float dotProduct = Vector3.Dot(_normal, toLight);
+            
             float magnitudeB = toLight.Length();
 
-            float cosineTheta = dotProduct / (magnitudeA * magnitudeB);
+            float cosineTheta = dotProduct / (magnitudeB);
 
             float intensity = Math.Max(0.0f, cosineTheta);
 
@@ -51,16 +62,5 @@ namespace SfmlPresentation.Utils.ColorProviders
             return new Color(finalIntensity, finalIntensity, finalIntensity);
         }
 
-        private Vector3 CalculateTriangleCentroid(
-            Vector3 point1, Vector3 point2, Vector3 point3)
-        {
-            Vector3 midPointAB = (point1 + point2) / 2;
-            Vector3 midPointBC = (point2 + point3) / 2;
-            Vector3 midPointCA = (point3 + point1) / 2;
-
-            Vector3 centroid = (midPointAB + midPointBC + midPointCA) / 3;
-
-            return centroid;
-        }
     }
 }

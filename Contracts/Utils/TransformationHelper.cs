@@ -52,17 +52,17 @@ namespace Business.Utils
             return vertices;
         }
 
-        public List<Vector3> ConvertTo2DCoordinates(List<Vector3> vertices, uint width, uint height, Vector3 eye)
+        public List<Vector3> ConvertTo2DCoordinates(List<Vector3> vertices, uint width, uint height, Vector3 eye, out Matrix4x4 finalMatrix)
         {
-            var finalMatrix = GetFinalMatrix(width, height, eye);
+            finalMatrix = GetFinalMatrix(width, height, eye);
             var result = vertices.ToList();
             _coordinateTransformer.ApplyTransformAndDivideByW(result, finalMatrix);
             return result;
         }
 
-        public Vector3 ConvertTo2DCoordinates(Vector3 target, uint width, uint height, Vector3 camera)
+        public Vector3 ConvertTo2DCoordinates(Vector3 target, uint width, uint height, Vector3 camera, out Matrix4x4 finalMatrix)
         {
-            var finalMatrix = GetFinalMatrix(width, height, camera);
+            finalMatrix = GetFinalMatrix(width, height, camera);
             return _coordinateTransformer.ApplyTransformAndDivideByW(target, finalMatrix);
         }
 

@@ -21,9 +21,7 @@ namespace Parser
             services.AddTransient<ILineDrawer, BresenhamDrawer>();
             services.AddTransient<IFaceDrawer, FaceDrawer>();            
             services.AddTransient<IRasterizationObjDrawer, RasterizationObjDrawer>();
-            services.AddTransient<IColorProvider, LambertianLightDistribution>();
-            services.AddTransient<IFaceShadowMapFiller, FaceShadowMapFiller>();
-            services.AddTransient<ILineShadowMapFiller, LineShadowMapFiller>();
+            services.AddTransient<IColorProvider, LambertianLightDistribution>();            
         }
     }
 }

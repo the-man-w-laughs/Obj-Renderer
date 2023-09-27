@@ -9,6 +9,7 @@ using SFML.Window;
 using SfmlPresentation.Contracts;
 using SfmlPresentation.Scene;
 using SfmlPresentation.Utils.Buffer;
+using SfmlPresentation.Utils.ColorProviders;
 using System;
 using System.Net.Http.Headers;
 using System.Numerics;
@@ -21,61 +22,43 @@ namespace SfmlPresentation.Utils.ObjDrawers
     {        
         private readonly IFaceDrawer _faceDrawer;
         private readonly ITransformationHelper _transformationHelper;
-        private readonly IColorProvider _colorProvider;
-        private readonly IFaceShadowMapFiller _faceShadowMapFiller;
+        private readonly IColorProvider _colorProvider;        
 
         public RasterizationObjDrawer(IFaceDrawer faceDrawer,
                                       ITransformationHelper transformationHelper,
-                                      IColorProvider colorProvider,
-                                      IFaceShadowMapFiller faceShadowMapFiller)
+                                      IColorProvider colorProvider)
         {            
             _faceDrawer = faceDrawer;
             _transformationHelper = transformationHelper;
-            this._colorProvider = colorProvider;
-            this._faceShadowMapFiller = faceShadowMapFiller;
+            this._colorProvider = colorProvider;            
         }
 
         public void Draw(List<Face> faces, List<Vector3> allVertices, Image image, Vector3 camera, Vector3 light)
         {
-            IZBuffer shadowMap = new ZBuffer(image.Size.X, image.Size.Y);
-
-            foreach (var face in faces)
-            {
-                var verticesToDraw = new Vector3[3];
-
-                for (var i = 0; i < 3; i++)
-                {
-                    var vertice = allVertices[face.VertexIndexList[i] - 1];
-                    verticesToDraw[i] = _transformationHelper.ConvertTo2DCoordinates(vertice, image.Size.X, image.Size.Y, light);
-                }
-                if (IsClockwise(verticesToDraw))
-                    continue;
-
-                shadowMap.PointCalculator = new PointCalculator(verticesToDraw);
-
-                _faceShadowMapFiller.DrawFace(verticesToDraw, shadowMap);
-            };
-
             IZBuffer zBuffer = new ZBuffer(image.Size.X, image.Size.Y);
-            foreach (var face in faces)
-            {
-                var vertices = new Vector3[3];
-                var verticesToDraw = new Vector3[3];               
+            var finalMatrix = new Matrix4x4();
+            var allVerticesToDraw = _transformationHelper.ConvertTo2DCoordinates(allVertices, image.Size.X, image.Size.Y, camera, out finalMatrix);
 
+            IColorProvider colorProvider = new LambertianLightDistribution(camera, light, finalMatrix);
+
+            foreach (var face in faces)
+            {                
+                var verticesToDraw = new Vector3[3];
+                var vertices = new Vector3[3];
+                
                 for (var i = 0; i < 3; i++)
                 {
+                    verticesToDraw[i] = allVerticesToDraw[face.VertexIndexList[i] - 1];
                     vertices[i] = allVertices[face.VertexIndexList[i] - 1];
-                    verticesToDraw[i] = _transformationHelper.ConvertTo2DCoordinates(vertices[i], image.Size.X, image.Size.Y, camera);                    
                 }
 
                 if (IsClockwise(verticesToDraw)) 
                     continue;
 
-                var color = _colorProvider.GetColor(vertices, light, shadowMap);
-
                 zBuffer.PointCalculator = new PointCalculator(verticesToDraw);
-                                
-                _faceDrawer.DrawFace(image, color, verticesToDraw, zBuffer);
+                
+                colorProvider.SetNormal(vertices);
+                _faceDrawer.DrawFace(image, verticesToDraw, colorProvider, zBuffer);
             };
         }
 

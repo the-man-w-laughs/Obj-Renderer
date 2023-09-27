@@ -6,6 +6,9 @@ namespace SfmlPresentation.Contracts
 {
     public interface IColorProvider
     {
-        Color GetColor(Vector3[] vertices, Vector3 light, IZBuffer zBuffer);
+        Vector3 Normal { set; }
+        void SetNormal(Vector3 normal);
+        void SetNormal(Vector3[] vertices);
+        Color GetColor(Vector3 vector);
     }
 }

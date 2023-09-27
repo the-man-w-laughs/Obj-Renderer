@@ -1,5 +1,6 @@
 ﻿using Business.Contracts.Utils;
 using SFML.Graphics;
+using SfmlPresentation.Scene;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,6 @@ namespace SfmlPresentation.Contracts
 {
     public interface IFaceDrawer
     {        
-        void DrawFace(Image image, Color color, Vector3[] vertices, IZBuffer zBuffer);
+        void DrawFace(Image image, Vector3[] vertices, IColorProvider colorProvider, IZBuffer zBuffer);
     }
 }

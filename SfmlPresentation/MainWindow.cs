@@ -15,6 +15,7 @@ using SFML.System;
 
 public partial class MainWindow
 {
+    #region ServiceInitialization
     private readonly IObjFileParcer _objFileParcer;
     private readonly ITransformationHelper _transformationHelper;    
     private readonly IRasterizationObjDrawer _rasterizationObjDrawer;
@@ -27,29 +28,28 @@ public partial class MainWindow
         this._transformationHelper = transformationHelper;        
         _rasterizationObjDrawer = rasterizationObjDrawer;
     }
+    #endregion
 
+    #region App
+    private RenderWindow _app;
+    private uint _screenWidth;
+    private uint _screenHeight;
+    #endregion
+
+    #region ObjRepresentation
+    private int _scale = 12;  
     private List<Vector3> _vertices;    
     private Texture _pixelTexture;
     private Image _image;
     private Sprite _pixelSprite;
+    private Obj _obj;
+    #endregion
 
-    private int _scale = 12;  
-
+    #region ControlsSettings
     private Camera _camera = new Camera(Math.PI / 2, 0, 7);
     private Camera _light = new Camera(Math.PI / 2, 0, 7);
     private bool _isSticky = false;
     private bool[] keyHandled = new bool[(int)Key.KeyCount];
-    private Obj _obj;
-
-    private RenderWindow _app;
-    private uint _screenWidth;
-    private uint _screenHeight;
-
-
-    private long _elapsedTicks;
-    private long _elapsedMilliseconds;
-    private Point _startPosition;    
-    private bool _isDown;
 
     private float _Smoothness = 0.004f;
     private float _rSmoothness = 1f;
@@ -64,6 +64,13 @@ public partial class MainWindow
     private float _cameraSmoothnessR = 0.01f;
     private bool _isMoving = true;
 
+    private long _elapsedTicks;
+    private long _elapsedMilliseconds;
+    private Point _startPosition;
+    private bool _isDown;
+    #endregion
+
+    #region InitializationMethods
     void AppConfiguration()
     {
         var desktopMode = VideoMode.DesktopMode;
@@ -80,30 +87,23 @@ public partial class MainWindow
         _screenHeight = desktopMode.Height;
     }
 
-    private void _app_Resized(object? sender, SizeEventArgs e)
-    {
-        _screenWidth = e.Width;
-        _screenHeight = e.Height;
-
-        FloatRect visibleArea = new FloatRect(0, 0, _screenWidth, _screenHeight);
-        _app.SetView(new View(visibleArea));
-
-        CanvasConfiguration(_screenWidth, _screenHeight);
-        _isMoving = true;
-    }
 
     void LoadScene(string path)
     {
         _obj = _objFileParcer.ParseObjFile(path);
         _vertices = _transformationHelper.ConvertToGlobalCoordinates(_obj, _scale, (new Vector3(1, 1, 1)), 0);             
     }
-
+    List<Vector3> CalculateNormals(List<Face> faces, List<Vector3> vertices)
+    {
+        return new List<Vector3>();
+    }
     void CanvasConfiguration(uint screenWidth, uint screenHeight)
     {
         _pixelTexture = new Texture(screenWidth, screenHeight);
         _image = new Image(screenWidth, screenHeight);
         _pixelSprite = new Sprite(_pixelTexture);        
     }
+    #endregion
     public void Run()
     {
         AppConfiguration();
@@ -119,17 +119,18 @@ public partial class MainWindow
             _app.DispatchEvents();
             HandleKeyboardInput();
             
-            //if (_isMoving) 
+            if (_isMoving) 
                 DrawImage();
             _isMoving = false;
             
             if (_elapsedMilliseconds > 0)
             {
                 Console.WriteLine($"FPS: {(_elapsedMilliseconds != 0 ? (1000.0f / _elapsedMilliseconds).ToString() : "inf")} ({_elapsedMilliseconds} ms/frame);");            
-            }
+            } 
         }
     }
 
+    #region Drawing
     void DrawImage()
     {
         ClearImage(Color.Black);
@@ -137,6 +138,30 @@ public partial class MainWindow
         _pixelTexture.Update(_image);
         _app.Draw(_pixelSprite);
         _app.Display();     
+    }
+    private void ClearImage(Color clearColor)
+    {
+        for (uint x = 0; x < _image.Size.X; x++)
+        {
+            for (uint y = 0; y < _image.Size.Y; y++)
+            {
+                _image.SetPixel(x, y, clearColor);
+            }
+        }
+    }
+    #endregion
+
+    #region AppEventHandlers
+    private void _app_Resized(object? sender, SizeEventArgs e)
+    {
+        _screenWidth = e.Width;
+        _screenHeight = e.Height;
+
+        FloatRect visibleArea = new FloatRect(0, 0, _screenWidth, _screenHeight);
+        _app.SetView(new View(visibleArea));
+
+        CanvasConfiguration(_screenWidth, _screenHeight);
+        _isMoving = true;
     }
 
     private void _app_MouseWheelScrolled(object? sender, MouseWheelScrollEventArgs e)
@@ -252,15 +277,6 @@ public partial class MainWindow
             _isMoving = true;
         }     
     }
+    #endregion
 
-    private void ClearImage(Color clearColor)
-    {
-        for (uint x = 0; x < _image.Size.X; x++)
-        {
-            for (uint y = 0; y < _image.Size.Y; y++)
-            {
-                _image.SetPixel(x, y, clearColor);
-            }
-        }
-    }
 }

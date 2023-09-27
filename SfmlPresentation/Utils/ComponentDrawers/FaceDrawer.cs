@@ -1,6 +1,7 @@
 ﻿using Business.Contracts.Utils;
 using SFML.Graphics;
 using SfmlPresentation.Contracts;
+using SfmlPresentation.Scene;
 using SfmlPresentation.Utils.Buffer;
 using System.Numerics;
 
@@ -15,7 +16,7 @@ namespace SfmlPresentation.Utils.ComponentDrawers
             this.lineDrawer = lineDrawer;
         }
 
-        public void DrawFace(Image image, Color color, Vector3[] vertices, IZBuffer zBuffer)
+        public void DrawFace(Image image, Vector3[] vertices, IColorProvider colorProvider, IZBuffer zBuffer)
         {
             if (vertices == null || vertices.Length < 3)
             {
@@ -63,7 +64,7 @@ namespace SfmlPresentation.Utils.ComponentDrawers
                     {
                         int x0 = intersections[i];
                         int x1 = intersections[i + 1];
-                        DrawLineIfIntersects(image, color, x0, (int)y, x1, (int)y, zBuffer);
+                        DrawLineIfIntersects(image, x0, (int)y, x1, (int)y, colorProvider, zBuffer);
                     }
                 }
             }
@@ -83,19 +84,19 @@ namespace SfmlPresentation.Utils.ComponentDrawers
             return x;
         }
 
-        private void DrawLineIfIntersects(Image image, Color color, int startX, int startY, int endX, int endY, IZBuffer buffer)
+        private void DrawLineIfIntersects(Image image, int startX, int startY, int endX, int endY, IColorProvider colorProvider, IZBuffer buffer)
         {
             var bitmapWidth = image.Size.X;
             var bitmapHeight = image.Size.Y;
 
             if (startX < 0) startX = 0;
-            if (endX > bitmapWidth) endX = startX;
+            if (endX > bitmapWidth) endX = (int)bitmapWidth;
 
-            if (startX >= 0 && startY >= 0 && startX < bitmapWidth && startY < bitmapHeight
-                && endX >= 0 && endY >= 0 && endX < bitmapWidth && endY < bitmapHeight)
+            if (startX >= 0 && startY >= 0 && startX <= bitmapWidth && startY <= bitmapHeight
+                && endX >= 0 && endY >= 0 && endX <= bitmapWidth && endY <= bitmapHeight)
             {
 
-                lineDrawer.DrawLine(image, color, (uint)startX, (uint)startY, (uint)endX, (uint)endY, buffer);
+                lineDrawer.DrawLine(image, (uint)startX, (uint)startY, (uint)endX, (uint)endY, colorProvider, buffer);
             }
         }
     }

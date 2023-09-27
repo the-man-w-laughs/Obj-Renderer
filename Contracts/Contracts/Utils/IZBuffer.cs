@@ -11,5 +11,6 @@ namespace Business.Contracts.Utils
 
         bool TryPoint(Vector3 vector);
         bool SetPoint(uint x, uint y);
+        float GetZValue(uint x, uint y);
     }
 }

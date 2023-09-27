@@ -62,5 +62,10 @@ namespace SfmlPresentation.Utils.Buffer
                 return true;
             }
         }
+
+        public float GetZValue(uint x, uint y)
+        {
+            return Buffer[x, y];
+        }
     }
 }
